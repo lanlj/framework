@@ -1,0 +1,14 @@
+{
+    "mappers": [
+        {
+            "path": "test.do",
+            "name": "TestController"
+        }
+    ],
+    "httpErrs": {
+        "400": {
+            "err_header": "HTTP/1.1 400 Bad Request",
+            "err_message": "<html><title>400 Bad Request</title><body>400 Bad Request</body></html>"
+        }
+    }
+}

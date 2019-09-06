@@ -1,0 +1,25 @@
+{
+    "name": "lanlj/framework",
+    "description": "Lan Li Jun's custom framework.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lan Li Jun",
+            "email": "jun@lanlj.com",
+            "homepage": "https://lanlj.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.27"
+    },
+    "autoload": {
+        "psr-4": {
+            "lanlj\\": "src/main"
+        },
+        "classmap": [
+            "src/3rd"
+        ]
+    }
+}
