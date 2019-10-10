@@ -208,7 +208,7 @@ final class Arrays
      */
     public function concatByCustom($delimiter = '&')
     {
-        $str = new String();
+        $str = new Strings();
         foreach ($this->array as $item) {
             if (is_array($item) || is_object($item))
                 $item = (new self($item))->concatByCustom($delimiter);

@@ -11,7 +11,7 @@ namespace lanlj\ctr;
 use lanlj\auth\Authorization;
 use lanlj\auth\Token;
 use lanlj\core\Arrays;
-use lanlj\core\String;
+use lanlj\core\Strings;
 use lanlj\http\storage\Cookie;
 use lanlj\http\storage\Session;
 use lanlj\json\Json;
@@ -122,7 +122,7 @@ abstract class AuthController extends CommController
             $authorization = new Authorization();
             $cookie = $this->req->getCookie($this->authName);
             if (!Utils::isEmpty($cookie)) {
-                $str = (new String($cookie))
+                $str = (new Strings($cookie))
                     ->replaceFirst('/bGFubG/', '')
                     ->replaceLast('/o5OA==/', '')->getString();
                 $tk = new Arrays(Json::toJson(base64_decode($str), true));

@@ -10,15 +10,20 @@ namespace lanlj\core;
 
 use lanlj\util\StringUtil;
 
-final class String
+final class Strings
 {
+    const GBK = "GBK";
+    const BIG5 = "BIG5";
+    const UTF8 = "UTF-8";
+    const GB2312 = "GB2312";
+
     /**
      * @var string
      */
     private $string;
 
     /**
-     * String constructor.
+     * Strings constructor.
      * @param string $string
      */
     public function __construct($string = '')
@@ -96,24 +101,23 @@ final class String
      */
     public function isEmpty()
     {
-        return $this->trim() == "";
+        return $this->string == "";
     }
 
     /**
      * 去除前后空格
-     * @return $this
+     * @return Strings
      */
     public function trim()
     {
-        $this->string = trim($this->string);
-        return $this;
+        return new self(trim($this->string));
     }
 
     /**
      * 字符串替换
      * @param mixed $search
      * @param mixed $replacement
-     * @return String
+     * @return Strings
      */
     public function replace($search, $replacement)
     {
@@ -124,7 +128,7 @@ final class String
      * 字符串正则替换所有匹配项
      * @param string $pattern
      * @param mixed $replacement
-     * @return String
+     * @return Strings
      */
     public function replaceAll($pattern, $replacement)
     {
@@ -135,7 +139,7 @@ final class String
      * 字符串正则替换最后匹配项
      * @param string $pattern
      * @param mixed $replacement
-     * @return String|$this
+     * @return Strings
      */
     public function replaceLast($pattern, $replacement)
     {
@@ -172,11 +176,12 @@ final class String
     }
 
     /**
+     * 获取字符串编码
      * @return string
      */
-    private function getEncoding()
+    public function getEncoding()
     {
-        return mb_detect_encoding($this->string);
+        return mb_detect_encoding($this->string, mb_detect_order());
     }
 
     /**
@@ -189,8 +194,32 @@ final class String
     }
 
     /**
+     * 转换字符串编码
+     * @param string $encoding
+     * @return Strings
+     */
+    public function convertEncoding($encoding = self::UTF8)
+    {
+        $to_encoding = (new self($encoding))->toUpperCase()->string;
+        $from_encoding = $this->getEncoding();
+        if ($from_encoding != $to_encoding) {
+            return new self(mb_convert_encoding($this->string, $to_encoding, $from_encoding));
+        }
+        return $this;
+    }
+
+    /**
+     * 英文字符串转大写
+     * @return Strings
+     */
+    public function toUpperCase()
+    {
+        return new self(mb_convert_case($this->string, MB_CASE_UPPER, $this->getEncoding()));
+    }
+
+    /**
      * 字符串反转
-     * @return String
+     * @return Strings
      */
     public function reverse()
     {
@@ -201,7 +230,7 @@ final class String
      * 字符串正则替换第一匹配项
      * @param string $pattern
      * @param mixed $replacement
-     * @return String
+     * @return Strings
      */
     public function replaceFirst($pattern, $replacement)
     {
@@ -229,7 +258,7 @@ final class String
      * 字符串截取
      * @param int $start
      * @param int $length
-     * @return String
+     * @return Strings
      */
     public function substring($start, $length = null)
     {
@@ -245,15 +274,6 @@ final class String
     public function indexOf($needle, $offset = null)
     {
         return mb_strpos($this->string, $needle, $offset, $this->getEncoding());
-    }
-
-    /**
-     * 英文字符串转大写
-     * @return String
-     */
-    public function toUpperCase()
-    {
-        return new self(mb_convert_case($this->string, MB_CASE_UPPER, $this->getEncoding()));
     }
 
     /**
@@ -278,7 +298,7 @@ final class String
 
     /**
      * 英文字符串转小写
-     * @return String
+     * @return Strings
      */
     public function toLowerCase()
     {

@@ -9,7 +9,7 @@
 namespace lanlj\http;
 
 use lanlj\core\Arrays;
-use lanlj\core\String;
+use lanlj\core\Strings;
 use lanlj\http\storage\Cookie;
 use lanlj\http\storage\Session;
 use lanlj\http\url\Url;
@@ -235,7 +235,7 @@ final class Request
      */
     public function getRequestURL()
     {
-        return (new String($this->getScheme()))
+        return (new Strings($this->getScheme()))
             ->concat('://')
             ->concat($this->getServerName())
             ->concat(in_array($this->getServerPort(), [80, 443]) ? '' : ':' . $this->getServerPort())

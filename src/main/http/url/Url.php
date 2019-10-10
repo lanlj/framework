@@ -9,7 +9,7 @@
 namespace lanlj\http\url;
 
 use lanlj\core\Arrays;
-use lanlj\core\String;
+use lanlj\core\Strings;
 
 final class Url
 {
@@ -37,7 +37,7 @@ final class Url
     {
         $arr = array();
         if (!is_null($url))
-            $arr = parse_url((new String($url))->trim()->replace('\\', '/'));
+            $arr = parse_url((new Strings($url))->trim()->replace('\\', '/'));
         $this->attributes = new Arrays($arr);
         $this->options = new Arrays(['scheme', 'host', 'port', 'path', 'query']);
     }
@@ -60,7 +60,7 @@ final class Url
         $port = $this->get(self::PORT, 80);
         $path = $this->get(self::PATH, '/');
         $query = $this->get(self::QUERY);
-        return (new String($scheme))->concat('://')
+        return (new Strings($scheme))->concat('://')
             ->concat($host)->concat(in_array($port, [80, 443]) ? '' : ":$port")
             ->concat($path)->concat(in_array($query, [null, '']) ? '' : "?$query")->getString();
     }
@@ -154,13 +154,13 @@ final class Url
             $this->attributes = $pathInfo->attributes;
             return $this;
         }
-        $anotherPath = (new String($anotherPath))->trim()->replace('\\', '/');
+        $anotherPath = (new Strings($anotherPath))->trim()->replace('\\', '/');
         if ($anotherPath->startsWith('/')) {
             $path = $anotherPath->getString();
         } else {
             $path = dirname($this->get(self::PATH)) . '/' . $anotherPath;
         }
-        $path = (new String($path))->replace('\\', '/');
+        $path = (new Strings($path))->replace('\\', '/');
         $rst = array();
         $pathArray = $path->split('/');
         if (!$pathArray[0]) $rst[] = '';
