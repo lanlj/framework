@@ -139,7 +139,7 @@ final class Strings
      * 字符串正则替换最后匹配项
      * @param string $pattern
      * @param mixed $replacement
-     * @return Strings
+     * @return $this|Strings
      */
     public function replaceLast($pattern, $replacement)
     {
@@ -195,14 +195,16 @@ final class Strings
 
     /**
      * 转换字符串编码
-     * @param string $encoding
-     * @return Strings
+     * @param string $to_encoding
+     * @param string $from_encoding
+     * @param bool $ignore
+     * @return $this|Strings
      */
-    public function convertEncoding($encoding = self::UTF8)
+    public function convertEncoding($to_encoding = self::UTF8, $from_encoding = null, $ignore = false)
     {
-        $to_encoding = (new self($encoding))->toUpperCase()->string;
-        $from_encoding = $this->getEncoding();
-        if ($from_encoding != $to_encoding) {
+        $to_encoding = (new self($to_encoding))->toUpperCase()->string;
+        $from_encoding = is_string($from_encoding) ? $from_encoding : $this->getEncoding();
+        if ($ignore || $from_encoding != $to_encoding) {
             return new self(mb_convert_encoding($this->string, $to_encoding, $from_encoding));
         }
         return $this;
