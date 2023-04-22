@@ -1,0 +1,32 @@
+{
+    "name": "lanlj/framework",
+    "description": "Lan Lijun's custom framework.",
+    "homepage": "https://works.lanlj.com/php/framework/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lan Lijun",
+            "email": "jun@lanlj.com",
+            "homepage": "https://lanlj.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "5.6.*",
+        "ext-mbstring": "*",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-dom": "*",
+        "ext-libxml": "*",
+        "ext-simplexml": "*",
+        "ezsql/ezsql": "3.0.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "lanlj\\fw\\": "src/main/"
+        },
+        "classmap": [
+            "src/3rd/"
+        ]
+    }
+}

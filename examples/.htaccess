@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteBase /framework/examples/
+    DirectoryIndex route.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . route.php [L]
+    RewriteRule ^src - [F,L]
+</IfModule>

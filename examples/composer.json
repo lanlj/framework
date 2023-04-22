@@ -1,0 +1,29 @@
+{
+    "name": "lanlj/examples",
+    "description": "Lan Lijun's examples of framework.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lan Lijun",
+            "email": "jun@lanlj.com",
+            "homepage": "https://lanlj.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "lanlj/framework": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "lanlj\\eg\\": "src/class/"
+        }
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../"
+        }
+    ]
+}
