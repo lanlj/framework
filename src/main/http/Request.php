@@ -310,4 +310,13 @@ final class Request
     {
         return $_SERVER['REQUEST_METHOD'];
     }
+
+    /**
+     * 获取请求体
+     * @return string
+     */
+    public function getRequestBody()
+    {
+        return file_get_contents('php://input');
+    }
 }

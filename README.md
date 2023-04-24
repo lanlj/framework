@@ -1,2 +1,2 @@
 # framework
-Lan Lijun's custom framework.
+Lan Lijun's custom PHP framework.

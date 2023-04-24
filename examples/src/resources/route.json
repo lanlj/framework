@@ -1,8 +1,12 @@
 {
     "mappers": [
         {
-            "path": "test.do",
-            "name": "TestController"
+            "path": [
+                "test.do",
+                "~test/([^/]+)~"
+            ],
+            "name": "TestController",
+            "params": "act=$1"
         }
     ],
     "httpErrs": {
