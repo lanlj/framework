@@ -9,49 +9,66 @@
 
 namespace lanlj\fw\repo;
 
-final class Credentials
+class Credentials
 {
-    const OR = "sUyM";
-    const AND = "va8e";
-    const LIKE = "qeiT";
-    const EQUAL = "Pj2Y";
+    const EQ = "m1.Pj2Y";
+    const NEQ = "m1.kzEs";
+    const LT = "m1.n5ig";
+    const LTE = "m1.YqFZ";
+    const GT = "m1.ut1U";
+    const GTE = "m1.G32h";
+    const LIKE = "m1.qeiT";
+    const NOT_LIKE = "m1.qWfF";
+
+    const _OR = "m2.sUyM";
+    const _AND = "m2.va8e";
+
+    protected const LABELS = [
+        self::EQ => "= '%s'", self::NEQ => "!= '%s'", self::LT => "< %u", self::LTE => "<= %u",
+        self::GT => "> %u", self::GTE => ">= %u", self::LIKE => "LIKE '%%%s%%'", self::NOT_LIKE => "NOT LIKE '%%%s%%'",
+        self::_OR => 'OR', self::_AND => 'AND'
+    ];
 
     /**
-     * @var array
+     * @var string
      */
-    private array $modes;
+    private string $col;
 
     /**
-     * @param string $mode1
-     * @param string $mode2
+     * @var string
      */
-    public function __construct(string $mode1, string $mode2)
+    private string $m1;
+
+    /**
+     * @var string
+     */
+    private string $m2;
+
+    /**
+     * @param string $col
+     * @param string $m1
+     * @param string $m2
+     */
+    public function __construct(string $col, string $m1 = self::EQ, string $m2 = self::_AND)
     {
-        $this->modes = [$mode1, $mode2];
+        $this->col = $col;
+        $this->m1 = self::LABELS[$m1];
+        $this->m2 = self::LABELS[$m2];
     }
 
     /**
-     * 默认参数
-     * @return Credentials
+     * @return string
      */
-    public static function default(): self
+    public function getCol(): string
     {
-        return new self(self::AND, self::EQUAL);
+        return $this->col;
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isOR(): bool
+    public function getLabel(): string
     {
-        return $this->modes[0] == self::OR;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLIKE(): bool
-    {
-        return $this->modes[1] == self::LIKE;
+        return " $this->m2 $this->col $this->m1";
     }
 }

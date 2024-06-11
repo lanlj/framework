@@ -80,7 +80,7 @@ class DBOUtil
     public function insert(string $table, $data): bool
     {
         return $this->dbo->insert(
-            $table, is_object($data) ? ArrayUtil::toArray($data, false, false, true) : $data
+            $table, !is_array($data) ? ArrayUtil::toArray($data, false, false, true) : $data
         );
     }
 
@@ -91,10 +91,10 @@ class DBOUtil
      * @param mixed ...$parameters
      * @return array
      */
-    public function getList(string $sql, string $class = null, ...$parameters): array
+    public function getList(string $sql, string $class = null, ...$parameters): ?array
     {
         $rst = $this->dbo->get_results(self::buildSQL2($sql, $parameters));
-        if (!is_string($class) || count($rst) < 1) return $rst;
+        if (!is_string($class) || !is_array($rst)) return $rst;
         $objs = array();
         foreach ($rst as $item) {
             $objs[] = BeanUtil::populate($item, $class, true);

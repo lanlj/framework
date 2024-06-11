@@ -24,9 +24,9 @@ final class Strings
      * Strings constructor.
      * @param string $string
      */
-    public function __construct(string $string = '')
+    public function __construct(?string $string = '')
     {
-        $this->string = $string;
+        $this->string = $string ?? '';
     }
 
     /**

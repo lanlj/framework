@@ -110,10 +110,10 @@ class Application implements BeanInstance
      * @param array $arr
      * @return array
      */
-    protected function arrPackage(array $arr): array
+    protected function arrPackage(?array $arr): array
     {
-        $len = count($arr);
-        if ($len === 0) return [];
+        if (!is_array($arr)) return [];
+        if (count($arr) === 0) return [];
         if ((new Arrays($arr))->getKeys()
             ->contains("@attributes", true)
         ) return [$arr];
@@ -221,7 +221,7 @@ class Application implements BeanInstance
     public static function getInstance(): self
     {
         if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            $instance = new static();
+            $instance = new self();
             if (is_subclass_of($instance->appClass, self::class)) {
                 $instance = call_user_func(array($instance->appClass, "newInstance"));
             }
@@ -237,7 +237,7 @@ class Application implements BeanInstance
     public static function newInstance(...$_): self
     {
         if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            self::$_instance = new self();
+            self::$_instance = new static();
         }
         return self::$_instance;
     }

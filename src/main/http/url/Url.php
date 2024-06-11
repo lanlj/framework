@@ -22,7 +22,7 @@ final class Url
     /**
      * @var Arrays
      */
-    private static Arrays $options;
+    private static ?Arrays $options = null;
 
     /**
      * @var Arrays

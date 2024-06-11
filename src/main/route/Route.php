@@ -75,7 +75,7 @@ class Route implements BeanInstance
         return new Arrays([
             400 => new HttpError(
                 "HTTP/1.1 400 Bad Request",
-                "<html lang='en'><title>400 Bad Request</title><body>400 Bad Request</body></html>"
+                '<html lang="en"><title>400 Bad Request</title><body>400 Bad Request</body></html>'
             ),
             403 => new HttpError(
                 'HTTP/1.1 403 Forbidden',
@@ -316,7 +316,7 @@ class Route implements BeanInstance
      * @param string $require
      * @return string
      */
-    protected function ifEval(string $require): string
+    protected function ifEval(?string $require): ?string
     {
         return substr($require, 0, 5) == 'eval_' ? eval('return ' . substr($require, 5) . ';') : $require;
     }

@@ -112,10 +112,10 @@ class BeanUtil
      * @param bool $db
      * @return string
      */
-    public static function getColumnName(ReflectionProperty $property, bool $db = false): string
+    public static function getColumnName(ReflectionProperty $property, bool $db = false): ?string
     {
         return $db && preg_match('/@column\([\'"]([A-Za-z0-9_]+)[\'"]\)/', $property->getDocComment(), $matches) == 1
-            ? $matches[2]
+            ? $matches[1]
             : $property->getName();
     }
 }
