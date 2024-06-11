@@ -9,12 +9,13 @@
 
 namespace lanlj\fw\db;
 
-use ezSQLcore;
+use ezsql\ezsqlModel;
 
 interface DB
 {
     /**
-     * @return ezSQLcore
+     * Get database object
+     * @return ezsqlModel
      */
-    public function getDBO();
+    public function getDBO(): ezsqlModel;
 }

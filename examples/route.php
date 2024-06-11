@@ -6,12 +6,11 @@
  * Time: 21:43
  */
 
-use lanlj\fw\route\Mapper;
-use lanlj\fw\route\Route;
+use lanlj\fw\route\{Mapper, Route};
 
 require "./vendor/autoload.php";
 
-$route = Route::getInstance()
+$route = Route::newInstance()
     ->setRoute(json_decode(file_get_contents("./src/resources/route.json"), true))
     ->setBaseDir("/framework/examples/")->setNamespace('\lanlj\eg\ctr\%s');
 $home = (new Mapper())

@@ -13,7 +13,7 @@ use lanlj\fw\app\Application;
 
 class App extends Application
 {
-    public $str = 'string';
+    public string $str = 'string';
 
     /**
      * App constructor.
@@ -21,15 +21,6 @@ class App extends Application
     protected function __construct()
     {
         parent::__construct();
-        echo __METHOD__ . PHP_EOL;
-    }
-
-    /**
-     * 启动程序
-     */
-    public function startup()
-    {
-        parent::startup();
         echo __METHOD__ . PHP_EOL;
     }
 }

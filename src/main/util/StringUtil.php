@@ -9,16 +9,15 @@
 namespace lanlj\fw\util;
 
 use lanlj\fw\core\Arrays;
-use lanlj\fw\json\Json;
 
-final class StringUtil
+class StringUtil
 {
     /**
      * 字符串是否base64编码
      * @param string $str
      * @return bool
      */
-    public static function isBase64($str)
+    public static function isBase64(?string $str): bool
     {
         return str_replace('=', '', $str) == str_replace('=', '', base64_encode(base64_decode($str)));
     }
@@ -28,7 +27,7 @@ final class StringUtil
      * @param bool $json
      * @return string
      */
-    public static function toString($var, $json = false)
+    public static function toString($var, bool $json = false): ?string
     {
         $s = null;
         $oa = null;
@@ -36,7 +35,7 @@ final class StringUtil
         elseif (is_object($var) && method_exists($var, "__toString")) $s = $var->__toString();
         elseif (is_array($var) || is_object($var)) $oa = new Arrays($var);
         else $s = strval($var);
-        if ($json) return is_null($s) ? Json::toJsonString($oa->getArray()) : Json::isJson($s) ? $s : Json::toJsonString($s);
+        if ($json) return is_null($s) ? JsonUtil::toJsonString($oa->getArray()) : (JsonUtil::isJson($s) ? $s : JsonUtil::toJsonString($s));
         return is_null($s) ? $oa->toQueryString("&", "arg") : $s;
     }
 }

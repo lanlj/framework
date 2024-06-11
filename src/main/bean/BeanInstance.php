@@ -12,8 +12,8 @@ namespace lanlj\fw\bean;
 interface BeanInstance
 {
     /**
-     * @param array ...$_
+     * @param mixed ...$_
      * @return self
      */
-    public static function newInstance(...$_);
+    public static function newInstance(...$_): ?self;
 }

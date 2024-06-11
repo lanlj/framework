@@ -6,7 +6,7 @@
  * Time: 14:04
  */
 
-namespace lanlj\fw\json;
+namespace lanlj\fw\model;
 
 use lanlj\fw\core\Arrays;
 use lanlj\fw\util\BooleanUtil;
@@ -14,16 +14,22 @@ use lanlj\fw\util\BooleanUtil;
 final class AjaxJson
 {
     /**
+     * 错误代码
+     * @var int
+     */
+    private ?int $code = null;
+
+    /**
      * 是否成功
      * @var bool
      */
-    private $success = false;
+    private ?bool $success = null;
 
     /**
      * 提示信息
      * @var string
      */
-    private $msg = "操作失败";
+    private ?string $msg = null;
 
     /**
      * 其他信息
@@ -35,7 +41,7 @@ final class AjaxJson
      * 其他参数
      * @var Arrays
      */
-    private $attributes = null;
+    private Arrays $attributes;
 
     /**
      * AjaxJson constructor.
@@ -46,18 +52,35 @@ final class AjaxJson
     }
 
     /**
+     * @return int
+     */
+    public function getCode(): ?int
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param int $code
+     */
+    public function setCode(?int $code): void
+    {
+        $this->code = $code;
+    }
+
+    /**
      * @return bool
      */
-    public function isSuccess()
+    public function isSuccess(): ?bool
     {
-        $this->success = BooleanUtil::toBool($this->success);
+        if (!is_null($this->success))
+            $this->success = BooleanUtil::toBool($this->success);
         return $this->success;
     }
 
     /**
      * @param bool $success
      */
-    public function setSuccess($success)
+    public function setSuccess(bool $success)
     {
         $this->success = $success;
     }
@@ -65,7 +88,7 @@ final class AjaxJson
     /**
      * @return string
      */
-    public function getMsg()
+    public function getMsg(): ?string
     {
         return $this->msg;
     }
@@ -73,7 +96,7 @@ final class AjaxJson
     /**
      * @param string $msg
      */
-    public function setMsg($msg)
+    public function setMsg(?string $msg)
     {
         $this->msg = $msg;
     }
@@ -97,7 +120,7 @@ final class AjaxJson
     /**
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): ?array
     {
         return $this->attributes->isEmpty() ? NULL : $this->attributes->getArray();
     }
@@ -106,7 +129,7 @@ final class AjaxJson
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(?string $name, $value)
     {
         $this->attributes->add($value, $name);
     }

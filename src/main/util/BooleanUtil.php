@@ -8,14 +8,14 @@
 
 namespace lanlj\fw\util;
 
-final class BooleanUtil
+class BooleanUtil
 {
     /**
-     * 变量是否为真（bool类型）
+     * 变量是否为真(bool类型)
      * @param mixed $var
      * @return bool
      */
-    public static function isTrue($var)
+    public static function isTrue($var): bool
     {
         return self::toBool($var) == true;
     }
@@ -25,7 +25,7 @@ final class BooleanUtil
      * @param mixed $var
      * @return bool
      */
-    public static function toBool($var)
+    public static function toBool($var): bool
     {
         if (!is_string($var)) return (bool)$var;
         switch (strtolower($var)) {
@@ -45,7 +45,7 @@ final class BooleanUtil
      * @param mixed $var
      * @return bool
      */
-    public static function isBool($var)
+    public static function isBool($var): bool
     {
         if (is_bool($var)) return true;
         if (!is_numeric($var) && !is_string($var)) return false;

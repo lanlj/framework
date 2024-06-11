@@ -15,5 +15,5 @@ interface Controller
      * 逻辑服务
      * @return int
      */
-    public function service();
+    public function service(): int;
 }

@@ -27,25 +27,25 @@ final class ShareCurl
      * 所有cURL标签
      * @var array
      */
-    private $labels = null;
+    private ?array $labels = null;
 
     /**
      * 所有cURL配置
      * @var array
      */
-    private $curls = null;
+    private ?array $curls = null;
 
     /**
      * 所有cURL句柄
      * @var array
      */
-    private $chs = null;
+    private ?array $chs = null;
 
     /**
      * 所有cURL句柄信息
      * @var array
      */
-    private $cURLInfo = null;
+    private ?array $cURLInfo = null;
 
     /**
      * ShareCurl constructor.
@@ -60,7 +60,7 @@ final class ShareCurl
      * @param resource $sh
      * @return $this
      */
-    public function setSh($sh)
+    public function setSh($sh): self
     {
         $this->closeSh();
         if (!is_resource($sh)) $sh = curl_share_init();
@@ -71,7 +71,7 @@ final class ShareCurl
     /**
      * Close resource
      */
-    private function closeSh()
+    private function closeSh(): void
     {
         if (is_resource($this->sh)) {
             unset($this->labels);
@@ -84,7 +84,7 @@ final class ShareCurl
     /**
      * @return array
      */
-    public function getCURLInfo()
+    public function getCURLInfo(): array
     {
         return $this->cURLInfo;
     }
@@ -94,7 +94,7 @@ final class ShareCurl
      * @param mixed $value
      * @return $this
      */
-    public function setOpt($option, $value)
+    public function setOpt(int $option, $value): self
     {
         curl_share_setopt($this->sh, $option, $value);
         return $this;
@@ -106,7 +106,7 @@ final class ShareCurl
      * @param string $method
      * @return $this
      */
-    public function setCurl($label, Curl $curl, $method = self::GET)
+    public function setCurl(?string $label, Curl $curl, ?string $method = self::GET): self
     {
         $curl->setOpt(CURLOPT_SHARE, $this->sh);
         switch ($method) {
@@ -129,7 +129,10 @@ final class ShareCurl
         return $this;
     }
 
-    public function exec()
+    /**
+     * @return array
+     */
+    public function exec(): array
     {
         $responses = array();
         foreach ($this->chs as $ch) {

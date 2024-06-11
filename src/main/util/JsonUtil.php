@@ -6,11 +6,10 @@
  * Time: 1:43
  */
 
-namespace lanlj\fw\json;
+namespace lanlj\fw\util;
 
-use lanlj\fw\util\ArrayUtil;
 
-final class Json
+class JsonUtil
 {
     /**
      * json数据格式化
@@ -18,7 +17,7 @@ final class Json
      * @param string $indent 缩进字符，默认4个空格
      * @return string
      */
-    public static function jsonFormat($data, $indent = null)
+    public static function jsonFormat($data, string $indent = null): string
     {
         $data = self::mergeOrFormatJson($data, false, false);
 
@@ -76,7 +75,7 @@ final class Json
      * @param bool $formatErrorJson
      * @return mixed
      */
-    private static function mergeOrFormatJson($data, $mergeJsonString, $formatErrorJson)
+    protected static function mergeOrFormatJson($data, bool $mergeJsonString, bool $formatErrorJson)
     {
         if (is_object($data)) $data = ArrayUtil::toArray($data, false, true);
 
@@ -104,7 +103,7 @@ final class Json
      * @param string $string
      * @return bool
      */
-    public static function isJson($string)
+    public static function isJson(?string $string): bool
     {
         json_decode($string);
         return json_last_error() == JSON_ERROR_NONE;
@@ -118,7 +117,7 @@ final class Json
      * @param bool $quotesKey
      * @return string
      */
-    private static function formatErrorJson($data, $quotesKey = false)
+    protected static function formatErrorJson(?string $data, bool $quotesKey = false): string
     {
         $json = str_replace('\'', '"', $data); //替换单引号为双引号
         $json = str_replace(array('\\"'), array('<|YH|>'), $json); //替换
@@ -137,7 +136,7 @@ final class Json
      * @param bool $formatErrorJson
      * @return string
      */
-    public static function toJsonString($things, $mergeJsonString = false, $formatErrorJson = false)
+    public static function toJsonString($things, bool $mergeJsonString = false, bool $formatErrorJson = false): string
     {
         return json_encode(self::mergeOrFormatJson($things, $mergeJsonString, $formatErrorJson));
     }
@@ -148,7 +147,7 @@ final class Json
      * @param bool $assoc
      * @return object|array|null
      */
-    public static function toJson($jsonString, $assoc = false)
+    public static function toJson(?string $jsonString, bool $assoc = false)
     {
         $json = json_decode($jsonString, $assoc);
         if (json_last_error() == JSON_ERROR_NONE) return $json;
@@ -159,7 +158,7 @@ final class Json
      * 将数组元素进行urlencode
      * @param string $val
      */
-    protected static function jsonFormatProtect(&$val)
+    protected static function jsonFormatProtect(?string &$val)
     {
         if ($val !== true && $val !== false && $val !== null) {
             $val = urlencode($val);

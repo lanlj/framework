@@ -14,11 +14,19 @@ use Exception;
 use lanlj\fw\core\Arrays;
 use ReflectionObject;
 
-final class ArrayUtil
+class ArrayUtil
 {
     const XML_ROOT = "root";
     const XML_CDATA = "cdata";
     const XML_FORMAT = "format";
+
+    /**
+     * The default value is true,
+     * When calling the "toArray" method,
+     * The property with a "NULL" value will be ignored. Otherwise,
+     * @var bool
+     */
+    static bool $objectIgnoreNULL = true;
 
     /**
      * @param array $arr
@@ -27,7 +35,7 @@ final class ArrayUtil
      * @param array $config
      * @return string
      */
-    public static function toXML(array $arr, $dom = null, $node = null, array $config = null)
+    public static function toXML(array $arr, DOMDocument $dom = null, DOMElement $node = null, array $config = null): string
     {
         $config = new Arrays($config);
         if (empty($dom)) $dom = new DOMDocument("1.0", "UTF-8");
@@ -55,9 +63,10 @@ final class ArrayUtil
      * @param mixed $var
      * @param bool $onlyPublic
      * @param bool $all
+     * @param bool $db
      * @return array
      */
-    public static function toArray($var, $onlyPublic = true, $all = false)
+    public static function toArray($var, bool $onlyPublic = true, bool $all = false, bool $db = false): array
     {
         $arr = array();
         if ($all && is_array($var)) {
@@ -74,9 +83,7 @@ final class ArrayUtil
         foreach ($ref->getProperties() as $property) {
             $name = $property->getName();
             $value = null;
-            $collect = true;
-            if ($onlyPublic && !$property->isPublic()) $collect = false;
-            if ($collect) {
+            if (!$onlyPublic || $property->isPublic()) {
                 $mn = ucwords(str_replace('_', '', $name));
                 $other_ways = true;
                 if (method_exists($var, $method_name = "get$mn") || method_exists($var, $method_name = "is$mn")) {
@@ -98,8 +105,24 @@ final class ArrayUtil
                 }
             }
             if ($all && (is_array($value) || is_object($value))) $value = self::toArray($value, $onlyPublic, $all);
-            if (!is_null($value)) $arr[$name] = $value;
+            if (!self::$objectIgnoreNULL || !is_null($value)) $arr[!$db ? $name : BeanUtil::getColumnName($property, $db)] = $value;
         }
         return $arr;
+    }
+
+    /**
+     * 获取嵌套数组值
+     * @param array $array
+     * @param array $keys
+     * @return mixed|null
+     */
+    public static function getNestedValue(array $array, array $keys)
+    {
+        if (count($keys) == 0) return null;
+        $key = array_shift($keys);
+        if (!array_key_exists($key, $array)) return null;
+        if (count($keys) == 0) return $array[$key];
+        if (is_array($array[$key])) return self::getNestedValue($array[$key], $keys);
+        return null;
     }
 }

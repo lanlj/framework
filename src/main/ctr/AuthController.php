@@ -8,16 +8,12 @@
 
 namespace lanlj\fw\ctr;
 
-use ezSQLcore;
 use lanlj\fw\auth\Authorization;
-use lanlj\fw\auth\Token;
-use lanlj\fw\core\Arrays;
-use lanlj\fw\core\Strings;
-use lanlj\fw\http\storage\Cookie;
-use lanlj\fw\http\storage\Session;
-use lanlj\fw\json\Json;
-use lanlj\fw\util\BooleanUtil;
-use lanlj\fw\util\Utils;
+use lanlj\fw\auth\po\{Account, Token};
+use lanlj\fw\core\{Arrays, Strings};
+use lanlj\fw\http\storage\{Cookie, Session};
+use lanlj\fw\repo\TokenRepo;
+use lanlj\fw\util\{BooleanUtil, JsonUtil, Utils};
 use stdClass;
 
 abstract class AuthController extends CommController
@@ -25,35 +21,27 @@ abstract class AuthController extends CommController
     /**
      * @var Session
      */
-    protected $session;
-
-    /**
-     * @var ezSQLcore
-     */
-    protected $dbo;
+    protected Session $session;
 
     /**
      * @var string
      */
-    protected $authName = "auth";
+    protected string $authName = "auth";
 
     /**
      * @var string
      */
-    protected $isCookieName = "isCookie";
+    protected string $isCookieName = "isCookie";
 
     /**
      * @var string
      */
-    private $cookiePath = "";
+    protected string $cookiePath = "";
 
     /**
-     * @param string $cookiePath
+     * @var TokenRepo
      */
-    protected function setCookiePath($cookiePath)
-    {
-        $this->cookiePath = $cookiePath;
-    }
+    protected TokenRepo $tokenRepo;
 
     /**
      * 保存授权
@@ -61,31 +49,30 @@ abstract class AuthController extends CommController
      * @param bool $cookie
      * @return bool
      */
-    protected final function saveAuthorization(Authorization $authorization, $cookie = false)
+    protected final function saveAuthorization(Authorization $authorization, bool $cookie = false): bool
     {
         $token = $authorization->getToken();
-        $account = $token->getAccount()->getId();
-        $sql = "SELECT id, expires FROM lj_token WHERE account = '%s' ORDER BY expires DESC LIMIT 0, 1;";
-        $rst = $this->dbo->get_row(sprintf($sql, $account));
+        $accountId = $token->getAccount()->getId();
+        $rst = $this->tokenRepo->getOneByAccountId($accountId);
         $bool = false;
         if (!is_null($rst) && $rst->expires - time() > 0) {
             $bool = true;
             $token->setId($rst->id);
+            $token->setToken($rst->token);
             $token->setExpires($rst->expires);
         }
         $this->session->setAttribute($this->authName, $authorization);
         if ($cookie) {
             $class = new stdClass();
-            $class->account = $account;
-            $class->token = $token->getId();
-            $ci = 'bGFubG' . str_replace('=', '', base64_encode(Json::toJsonString($class))) . 'o5OA==';
+            $class->account = $accountId;
+            $class->token = $token->getToken();
+            $ci = 'bGFubG' . str_replace('=', '', base64_encode(JsonUtil::toJsonString($class))) . 'o5OA==';
             $cookie = new Cookie($this->authName, $ci);
             $cookie->setExpire($token->getExpires());
             $cookie->setPath($this->cookiePath);
             $this->resp->addCookie($cookie);
             if (!$bool) {
-                $sql = "INSERT INTO lj_token VALUES('%s', '%s', '%s');";
-                return $this->dbo->query(sprintf($sql, $class->token, $class->account, $token->getExpires()));
+                return $this->tokenRepo->insert(new Token(null, $class->token, new Account($class->account), $token->getExpires()));
             }
         }
         return true;
@@ -94,7 +81,7 @@ abstract class AuthController extends CommController
     /**
      * 移除授权
      */
-    protected final function removeAuthorization()
+    protected final function removeAuthorization(): void
     {
         $this->session->removeAttribute($this->authName);
         $this->session->removeAttribute($this->isCookieName);
@@ -106,10 +93,9 @@ abstract class AuthController extends CommController
     /**
      * 是否授权
      */
-    protected final function isAuthorization()
+    protected final function isAuthorization(): void
     {
-        if (!$this->getAuthorization()->isAuth())
-            die('Unauthorized.');
+        if (!$this->getAuthorization()->isAuth()) die('Unauthorized.');
     }
 
     /**
@@ -117,7 +103,7 @@ abstract class AuthController extends CommController
      * @param bool $origin
      * @return Authorization|stdClass
      */
-    protected final function getAuthorization($origin = false)
+    protected final function getAuthorization(bool $origin = false)
     {
         $authorization = $this->session->getAttribute($this->authName);
         if (is_null($authorization)) {
@@ -127,10 +113,10 @@ abstract class AuthController extends CommController
                 $str = (new Strings($cookie))
                     ->replaceFirst('/bGFubG/', '')
                     ->replaceLast('/o5OA==/', '')->getString();
-                $tk = new Arrays(Json::toJson(base64_decode($str), true));
-                $rst = $this->dbo->get_row(sprintf("SELECT * FROM lj_token WHERE id = '%s';", $tk->get('token')));
+                $tk = new Arrays(JsonUtil::toJson(base64_decode($str), true));
+                $rst = $this->tokenRepo->getOneByToken($tk->get('token'));
                 if (!is_null($rst)) {
-                    if ($rst->account == $tk->get('account') && $rst->expires - time() > 0) {
+                    if ($rst->account_id == $tk->get('account') && $rst->expires - time() > 0) {
                         $authorization->setToken(Token::mapping($rst));
                         $this->session->setAttribute($this->isCookieName, true);
                         $this->session->setAttribute($this->authName, $authorization);
@@ -152,19 +138,11 @@ abstract class AuthController extends CommController
      * 初始化配置
      * @return void
      */
-    protected function init()
+    protected function init(): void
     {
         parent::init();
-        $this->session = Session::getInstance();
+        $this->session = Session::newInstance();
         date_default_timezone_set("Asia/Shanghai");
-    }
-
-    /**
-     * @param ezSQLcore $dbo
-     */
-    protected function setDBO(ezSQLcore $dbo)
-    {
-        $this->dbo = $dbo;
-        $this->dbo->setPrepare();
+        $this->tokenRepo = new TokenRepo();
     }
 }

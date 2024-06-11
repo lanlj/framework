@@ -10,8 +10,7 @@
 namespace lanlj\fw\filter;
 
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\http\Request;
-use lanlj\fw\http\Response;
+use lanlj\fw\http\{Request, Response};
 
 final class CORSFilter implements Filter, BeanMapping
 {
@@ -19,7 +18,7 @@ final class CORSFilter implements Filter, BeanMapping
      * @param object|array $values
      * @return $this
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
         if ($values instanceof self) return $values;
         return new self();
@@ -29,7 +28,7 @@ final class CORSFilter implements Filter, BeanMapping
      * @param Request $request
      * @param Response $response
      */
-    public function doFilter(Request $request, Response $response)
+    public function doFilter(Request $request, Response $response): void
     {
         $response->setHeaders([
             'Access-Control-Allow-Origin' => '*',

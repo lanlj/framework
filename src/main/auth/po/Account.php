@@ -6,7 +6,7 @@
  * Time: 15:02
  */
 
-namespace lanlj\fw\auth;
+namespace lanlj\fw\auth\po;
 
 use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
@@ -17,22 +17,22 @@ class Account implements BeanMapping
      * ID
      * @var string
      */
-    protected $id;
+    protected ?string $id;
 
     /**
      * Account constructor.
      * @param string $id
      */
-    public function __construct($id = null)
+    public function __construct(string $id = null)
     {
         $this->id = $id;
     }
 
     /**
      * @param object|array $values
-     * @return $this
+     * @return self
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
         if ($values instanceof self)
             return $values;
@@ -43,7 +43,7 @@ class Account implements BeanMapping
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -51,7 +51,7 @@ class Account implements BeanMapping
     /**
      * @param string $id
      */
-    public function setId($id)
+    public function setId(string $id)
     {
         $this->id = $id;
     }

@@ -15,5 +15,5 @@ interface BeanMapping
      * @param object|array $values
      * @return self
      */
-    public static function mapping($values);
+    public static function mapping($values): ?self;
 }

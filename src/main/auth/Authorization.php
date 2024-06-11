@@ -8,16 +8,17 @@
 
 namespace lanlj\fw\auth;
 
+use lanlj\fw\auth\po\Token;
 use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
 
-final class Authorization implements BeanMapping
+class Authorization implements BeanMapping
 {
     /**
      * 授权令牌
      * @var Token
      */
-    private $token;
+    private ?Token $token;
 
     /**
      * Authorization constructor.
@@ -30,12 +31,11 @@ final class Authorization implements BeanMapping
 
     /**
      * @param object|array $values
-     * @return $this
+     * @return self
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
-        if ($values instanceof self)
-            return $values;
+        if ($values instanceof self) return $values;
         $values = new Arrays($values);
         return new self($values->get('token'));
     }
@@ -43,7 +43,7 @@ final class Authorization implements BeanMapping
     /**
      * @return bool
      */
-    public function isAuth()
+    public function isAuth(): bool
     {
         return !is_null($this->token) && !is_null($this->token->getAccount());
     }
@@ -51,7 +51,7 @@ final class Authorization implements BeanMapping
     /**
      * @return Token
      */
-    public function getToken()
+    public function getToken(): ?Token
     {
         return $this->token;
     }

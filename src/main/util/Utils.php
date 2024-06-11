@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\util;
 
-final class Utils
+class Utils
 {
     const TYPE_BOOL = "boolean";
     const TYPE_INT = "integer";
@@ -24,7 +24,7 @@ final class Utils
      * 生成guid
      * @return string
      */
-    public static function guid()
+    public static function guid(): string
     {
         mt_srand((double)microtime() * 10000); //optional for php 4.2.0 and up.
         return md5(uniqid(rand(), true));
@@ -38,8 +38,7 @@ final class Utils
      */
     public static function getDefault($var, $key, $default = null)
     {
-        if (is_object($var))
-            $var = ArrayUtil::toArray($var, false, true);
+        if (is_object($var)) $var = ArrayUtil::toArray($var, false, true);
         $v = array_key_exists($key, $var) ? $var[$key] : $default;
         return Utils::getVal($v, $default);
     }
@@ -61,7 +60,7 @@ final class Utils
      * @param mixed $var
      * @return bool
      */
-    public static function isEmpty($var)
+    public static function isEmpty($var): bool
     {
         if (is_null($var)) return true;
         if (is_string($var) && trim($var) === "") return true;
@@ -73,7 +72,7 @@ final class Utils
      * @param string $type
      * @return bool
      */
-    public static function setType(&$var, $type)
+    public static function setType(&$var, ?string $type): bool
     {
         switch ($type) {
             case "bool":
@@ -99,7 +98,7 @@ final class Utils
      * @param mixed $var Variable
      * @return string Type of variable
      */
-    public static function getType($var)
+    public static function getType($var): ?string
     {
         if (is_bool($var)) return self::TYPE_BOOL;
         if (is_int($var)) return self::TYPE_INT;

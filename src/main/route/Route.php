@@ -9,31 +9,32 @@
 namespace lanlj\fw\route;
 
 use lanlj\fw\app\Application;
+use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\core\Arrays;
 use lanlj\fw\ctr\Controller;
 use lanlj\fw\http\Request;
 use lanlj\fw\route\exception\HttpError;
 use lanlj\fw\util\ArrayUtil;
 
-class Route
+class Route implements BeanInstance
 {
     /**
      * 对象实例
-     * @var Route
+     * @var self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * 路由表
      * @var Arrays
      */
-    protected $route;
+    protected Arrays $route;
 
     /**
      * 请求Path
      * @var string
      */
-    protected $reqPath;
+    protected string $reqPath;
 
     /**
      * Route constructor.
@@ -46,12 +47,11 @@ class Route
     /**
      * 初始化配置
      */
-    protected function init()
+    protected function init(): void
     {
         ob_start(); // 开启缓冲区
 
         $app = Application::getInstance();
-        $app->startup();
 
         $httpErrs = $this->getDefaultHttpErrs();
 
@@ -70,9 +70,13 @@ class Route
      * 默认HTTP错误列表
      * @return Arrays
      */
-    protected function getDefaultHttpErrs()
+    protected function getDefaultHttpErrs(): Arrays
     {
         return new Arrays([
+            400 => new HttpError(
+                "HTTP/1.1 400 Bad Request",
+                "<html lang='en'><title>400 Bad Request</title><body>400 Bad Request</body></html>"
+            ),
             403 => new HttpError(
                 'HTTP/1.1 403 Forbidden',
                 '<html lang="en"><title>403 Forbidden</title><body>403 Forbidden</body></html>'
@@ -90,9 +94,10 @@ class Route
 
     /**
      * 获取路由实例
-     * @return Route
+     * @param mixed ...$_
+     * @return self
      */
-    public static final function getInstance()
+    public static final function newInstance(...$_): self
     {
         if (is_null(self::$_instance) || !isset(self::$_instance)) {
             self::$_instance = new static();
@@ -104,7 +109,7 @@ class Route
      * @param array|object $route
      * @return $this
      */
-    public function setRoute($route)
+    public function setRoute($route): self
     {
         $this->route->addAll(ArrayUtil::toArray($route, false, true));
         $httpErrs = $this->getDefaultHttpErrs();
@@ -117,7 +122,7 @@ class Route
      * @param string $baseDir
      * @return $this
      */
-    public function setBaseDir($baseDir)
+    public function setBaseDir(?string $baseDir): self
     {
         $this->route->add($baseDir, 'baseDir');
         return $this;
@@ -127,7 +132,7 @@ class Route
      * @param string|array $requires
      * @return $this
      */
-    public function setRequires($requires)
+    public function setRequires($requires): self
     {
         $this->route->add($requires, 'requires');
         return $this;
@@ -137,7 +142,7 @@ class Route
      * @param string $namespace
      * @return $this
      */
-    public function setNamespace($namespace)
+    public function setNamespace(?string $namespace): self
     {
         $this->route->add($namespace, 'namespace');
         return $this;
@@ -147,7 +152,7 @@ class Route
      * @param Mapper $defaultMapper
      * @return $this
      */
-    public function setDefaultMapper(Mapper $defaultMapper)
+    public function setDefaultMapper(Mapper $defaultMapper): self
     {
         $this->route->add($defaultMapper, 'defaultMapper');
         return $this;
@@ -157,7 +162,7 @@ class Route
      * @param Mapper $homeMapper
      * @return $this
      */
-    public function setHomeMapper(Mapper $homeMapper)
+    public function setHomeMapper(Mapper $homeMapper): self
     {
         $path = $homeMapper->getPath();
         $path[] = '';
@@ -169,7 +174,7 @@ class Route
      * @param Mapper $mapper
      * @return $this
      */
-    public function addMapper(Mapper $mapper)
+    public function addMapper(Mapper $mapper): self
     {
         $mappers = new Arrays($this->route->get('mappers', []));
         $this->route->add($mappers->add($mapper)->getArray(), 'mappers');
@@ -179,7 +184,7 @@ class Route
     /**
      * 执行路由
      */
-    public function run()
+    public function run(): void
     {
         $mapper = $this->getMapper();
         $requires = $this->route->get('requires', []);
@@ -221,7 +226,7 @@ class Route
         if ($ctr instanceof Controller) {
             $status = $ctr->service();
         }
-        if ($status != 1) {
+        if ($status != 200) {
             ob_end_clean(); // 删除缓冲区内容并关闭
             header('Content-Type: text/html; charset=utf-8');
         }
@@ -236,7 +241,7 @@ class Route
      * 获取Mapper对象
      * @return Mapper
      */
-    protected function getMapper()
+    protected function getMapper(): Mapper
     {
         $baseDir = $this->route->get('baseDir', '/');
         $reqPath = preg_replace("~$baseDir~", '', $this->reqPath, 1);
@@ -279,7 +284,7 @@ class Route
      * @param string $reqPath
      * @return string
      */
-    protected function getPath($paths, $reqPath)
+    protected function getPath($paths, string $reqPath): ?string
     {
         if (!is_array($paths)) $paths = [$paths];
         foreach ($paths as $path) {
@@ -297,7 +302,7 @@ class Route
      * @param int $err_code
      * @return HttpError
      */
-    public function getHttpErr($err_code)
+    public function getHttpErr(int $err_code): ?HttpError
     {
         $httpErrs = new Arrays($this->route->get('httpErrs', []));
         $httpErr = $httpErrs->get($err_code);
@@ -311,11 +316,9 @@ class Route
      * @param string $require
      * @return string
      */
-    protected function ifEval($require)
+    protected function ifEval(string $require): string
     {
-        return substr($require, 0, 5) == 'eval_'
-            ? $require = eval('return ' . substr($require, 5))
-            : $require;
+        return substr($require, 0, 5) == 'eval_' ? eval('return ' . substr($require, 5) . ';') : $require;
     }
 
     /**
@@ -323,7 +326,7 @@ class Route
      * @param HttpError $http_err
      * @return $this
      */
-    public function addHttpErr($err_code, HttpError $http_err)
+    public function addHttpErr(int $err_code, HttpError $http_err): self
     {
         $httpErrs = new Arrays($this->route->get('httpErrs', []));
         $this->route->add($httpErrs->add($http_err, $err_code)->getArray(), 'httpErrs');

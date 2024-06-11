@@ -17,9 +17,9 @@ class DefaultController extends CommController
      * 逻辑服务
      * @return int
      */
-    public function service()
+    public function service(): int
     {
         echo "This is a default page.";
-        return 1;
+        return 200;
     }
 }

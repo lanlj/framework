@@ -18,7 +18,7 @@ class TestController extends CommController
      * 可用行为集合
      * @var array
      */
-    private $acts = array(
+    private array $acts = array(
         'trb' => 'testRequestBody',
     );
 
@@ -26,7 +26,7 @@ class TestController extends CommController
      * 逻辑服务
      * @return int
      */
-    public function service()
+    public function service(): int
     {
         $act = $this->getParam("act");
         $acts = new Arrays($this->acts);
@@ -36,7 +36,7 @@ class TestController extends CommController
         }
         echo "This is test page." . PHP_EOL;
         echo "Visited " . $this->req->getSession()->getAttribute("views") . " times." . PHP_EOL;
-        return 1;
+        return 200;
     }
 
     /**

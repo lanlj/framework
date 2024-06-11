@@ -9,8 +9,7 @@
 namespace lanlj\eg\filter;
 
 use lanlj\fw\filter\Filter;
-use lanlj\fw\http\Request;
-use lanlj\fw\http\Response;
+use lanlj\fw\http\{Request, Response};
 use lanlj\fw\util\Utils;
 
 class TestFilter implements Filter
@@ -19,7 +18,7 @@ class TestFilter implements Filter
      * @param Request $request
      * @param Response $response
      */
-    public function doFilter(Request $request, Response $response)
+    public function doFilter(Request $request, Response $response): void
     {
         echo __METHOD__ . PHP_EOL;
 

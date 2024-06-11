@@ -9,25 +9,24 @@
 namespace lanlj\fw\util;
 
 use Exception;
-use lanlj\fw\bean\BeanInstance;
-use lanlj\fw\bean\BeanMapping;
+use lanlj\fw\bean\{BeanInstance, BeanMapping};
 use lanlj\fw\core\Arrays;
 use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;
 
-final class BeanUtil
+class BeanUtil
 {
     /**
-     * @param array $valuesS
-     * @param $class
+     * @param array $valuesList
+     * @param mixed $class
      * @param bool $db
      * @return array
      */
-    public static function populates(array $valuesS, $class, $db = false)
+    public static function populates(array $valuesList, $class, bool $db = false): array
     {
         $objs = [];
-        foreach ($valuesS as $values) {
+        foreach ($valuesList as $values) {
             $obj = self::populate($values, $class, $db);
             if (!is_null($obj)) $objs[] = $obj;
         }
@@ -37,11 +36,11 @@ final class BeanUtil
     /**
      * NULL is returned if the specified class is not exist.
      * @param object|array $values
-     * @param string $class
+     * @param mixed $class
      * @param bool $db
      * @return object|null
      */
-    public static function populate($values, $class, $db = false)
+    public static function populate($values, $class, bool $db = false): ?object
     {
         if (is_subclass_of($class, BeanMapping::class))
             return call_user_func(array($class, 'mapping'), $values);
@@ -75,10 +74,10 @@ final class BeanUtil
     }
 
     /**
-     * @param string $class
+     * @param mixed $class
      * @return object|null
      */
-    public static function newInstance($class)
+    public static function newInstance($class): ?object
     {
         if (is_object($class)) return $class;
         if (!class_exists($class)) return null;
@@ -113,7 +112,7 @@ final class BeanUtil
      * @param bool $db
      * @return string
      */
-    private static function getColumnName(ReflectionProperty $property, $db = false)
+    public static function getColumnName(ReflectionProperty $property, bool $db = false): string
     {
         return $db && preg_match('/@column\([\'"]([A-Za-z0-9_]+)[\'"]\)/', $property->getDocComment(), $matches) == 1
             ? $matches[2]

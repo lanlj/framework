@@ -15,44 +15,44 @@ final class Cookie
     /**
      * @var string
      */
-    private $name;
+    private ?string $name;
 
     /**
-     * @var mixed
+     * @var string
      */
-    private $value;
+    private string $value;
 
     /**
      * @var int
      */
-    private $expire = 0;
+    private int $expire = 0;
 
     /**
      * @var string
      */
-    private $path = '';
+    private string $path = '';
 
     /**
      * @var string
      */
-    private $domain = '';
+    private string $domain = '';
 
     /**
      * @var bool
      */
-    private $secure = false;
+    private bool $secure = false;
 
     /**
      * @var bool
      */
-    private $httpOnly = false;
+    private bool $httpOnly = false;
 
     /**
      * Cookie constructor.
      * @param string $name
      * @param mixed $value
      */
-    public function __construct($name, $value)
+    public function __construct(?string $name, $value)
     {
         $this->name = $name;
         $this->setValue($value);
@@ -61,7 +61,7 @@ final class Cookie
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -69,7 +69,7 @@ final class Cookie
     /**
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -78,7 +78,7 @@ final class Cookie
      * @param mixed $value
      * @return $this
      */
-    public function setValue($value)
+    public function setValue($value): self
     {
         $this->value = StringUtil::toString($value);
         return $this;
@@ -87,7 +87,7 @@ final class Cookie
     /**
      * @return int
      */
-    public function getExpire()
+    public function getExpire(): int
     {
         return $this->expire;
     }
@@ -96,7 +96,7 @@ final class Cookie
      * @param int $expire
      * @return $this
      */
-    public function setExpire($expire)
+    public function setExpire(int $expire): self
     {
         $this->expire = $expire;
         return $this;
@@ -105,7 +105,7 @@ final class Cookie
     /**
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -114,7 +114,7 @@ final class Cookie
      * @param string $path
      * @return $this
      */
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $this->path = $path;
         return $this;
@@ -123,7 +123,7 @@ final class Cookie
     /**
      * @return string
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
@@ -132,7 +132,7 @@ final class Cookie
      * @param string $domain
      * @return $this
      */
-    public function setDomain($domain)
+    public function setDomain(string $domain): self
     {
         $this->domain = $domain;
         return $this;
@@ -141,7 +141,7 @@ final class Cookie
     /**
      * @return bool
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return $this->secure;
     }
@@ -150,7 +150,7 @@ final class Cookie
      * @param bool $secure
      * @return $this
      */
-    public function setSecure($secure)
+    public function setSecure(bool $secure): self
     {
         $this->secure = $secure;
         return $this;
@@ -159,7 +159,7 @@ final class Cookie
     /**
      * @return bool
      */
-    public function isHttpOnly()
+    public function isHttpOnly(): bool
     {
         return $this->httpOnly;
     }
@@ -168,7 +168,7 @@ final class Cookie
      * @param bool $httpOnly
      * @return $this
      */
-    public function setHttpOnly($httpOnly)
+    public function setHttpOnly(bool $httpOnly): self
     {
         $this->httpOnly = $httpOnly;
         return $this;

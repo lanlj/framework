@@ -17,19 +17,19 @@ class HttpError implements BeanMapping
     /**
      * @var string
      */
-    private $err_header;
+    private ?string $err_header;
 
     /**
      * @var string
      */
-    private $err_message;
+    private ?string $err_message;
 
     /**
      * Error constructor.
      * @param string $err_header
      * @param string $err_message
      */
-    public function __construct($err_header = null, $err_message = null)
+    public function __construct(string $err_header = null, string $err_message = null)
     {
         $this->err_header = $err_header;
         $this->err_message = $err_message;
@@ -39,7 +39,7 @@ class HttpError implements BeanMapping
      * @param object|array $values
      * @return self
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
         if ($values instanceof self)
             return $values;
@@ -53,16 +53,16 @@ class HttpError implements BeanMapping
     /**
      * @return string
      */
-    public function getErrHeader()
+    public function getErrHeader(): ?string
     {
         return $this->err_header;
     }
 
     /**
      * @param string $err_header
-     * @return HttpError
+     * @return self
      */
-    public function setErrHeader($err_header)
+    public function setErrHeader(string $err_header): self
     {
         $this->err_header = $err_header;
         return $this;
@@ -71,16 +71,16 @@ class HttpError implements BeanMapping
     /**
      * @return string
      */
-    public function getErrMessage()
+    public function getErrMessage(): ?string
     {
         return $this->err_message;
     }
 
     /**
      * @param string $err_message
-     * @return HttpError
+     * @return self
      */
-    public function setErrMessage($err_message)
+    public function setErrMessage(string $err_message): self
     {
         $this->err_message = $err_message;
         return $this;

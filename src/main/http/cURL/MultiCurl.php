@@ -27,19 +27,19 @@ final class MultiCurl
      * 所有cURL标签
      * @var array
      */
-    private $labels = null;
+    private ?array $labels = null;
 
     /**
      * 所有cURL配置
      * @var array
      */
-    private $curls = null;
+    private ?array $curls = null;
 
     /**
      * 所有cURL句柄信息
      * @var array
      */
-    private $cURLInfo = null;
+    private ?array $cURLInfo = null;
 
     /**
      * MultiCurl constructor.
@@ -54,7 +54,7 @@ final class MultiCurl
      * @param resource $mh
      * @return $this
      */
-    public function setMh($mh)
+    public function setMh($mh): self
     {
         $this->closeMh();
         if (!is_resource($mh)) $mh = curl_multi_init();
@@ -65,7 +65,7 @@ final class MultiCurl
     /**
      * Close resource
      */
-    private function closeMh()
+    private function closeMh(): void
     {
         if (is_resource($this->mh)) {
             unset($this->labels);
@@ -77,7 +77,7 @@ final class MultiCurl
     /**
      * @return array
      */
-    public function getCURLInfo()
+    public function getCURLInfo(): array
     {
         return $this->cURLInfo;
     }
@@ -88,7 +88,7 @@ final class MultiCurl
      * @param string $method
      * @return $this
      */
-    public function setCurl($label, Curl $curl, $method = self::GET)
+    public function setCurl(?string $label, Curl $curl, ?string $method = self::GET): self
     {
         switch ($method) {
             case self::POST:
@@ -113,7 +113,7 @@ final class MultiCurl
     /**
      * @return array
      */
-    public function exec()
+    public function exec(): array
     {
         $responses = array();
         $active = null;

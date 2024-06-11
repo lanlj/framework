@@ -10,9 +10,7 @@ namespace lanlj\fw\http;
 
 use lanlj\fw\core\Arrays;
 use lanlj\fw\http\storage\Cookie;
-use lanlj\fw\json\Json;
-use lanlj\fw\util\StringUtil;
-use lanlj\fw\util\Utils;
+use lanlj\fw\util\{JsonUtil, StringUtil, Utils};
 
 final class Response
 {
@@ -27,7 +25,7 @@ final class Response
      * @param string $name
      * @return mixed
      */
-    public function getHeader($name)
+    public function getHeader(?string $name)
     {
         return $this->parseHeader()->get($name);
     }
@@ -35,7 +33,7 @@ final class Response
     /**
      * @return Arrays
      */
-    private function parseHeader()
+    private function parseHeader(): Arrays
     {
         $headers = new Arrays();
         foreach (headers_list() as $header) {
@@ -52,7 +50,7 @@ final class Response
     /**
      * @return Arrays
      */
-    public function getHeaderNames()
+    public function getHeaderNames(): Arrays
     {
         return $this->parseHeader()->getKeys();
     }
@@ -63,27 +61,26 @@ final class Response
     public function writeJson($value)
     {
         $this->setContentType('text/json, application/json; charset=utf-8');
-        echo Json::toJsonString($value, false, true);
+        echo JsonUtil::toJsonString($value, false, true);
     }
 
     /**
      * @param string $contentType
-     * @return Response
+     * @return self
      */
-    public function setContentType($contentType)
+    public function setContentType(?string $contentType): self
     {
         return $this->setHeader('Content-Type', $contentType);
     }
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param string $value
      * @return $this
      */
-    public function setHeader($name, $value)
+    public function setHeader(string $name, string $value): self
     {
-        if (!headers_sent())
-            header($name . ': ' . $value);
+        if (!headers_sent()) header($name . ': ' . $value);
         return $this;
     }
 
@@ -91,7 +88,7 @@ final class Response
      * @param string $name
      * @return $this
      */
-    public function removeHeader($name)
+    public function removeHeader(?string $name): self
     {
         header_remove($name);
         return $this;
@@ -100,7 +97,7 @@ final class Response
     /**
      * @return $this
      */
-    public function removeHeaders()
+    public function removeHeaders(): self
     {
         header_remove();
         return $this;
@@ -118,7 +115,7 @@ final class Response
      * @param Cookie $cookie
      * @return $this
      */
-    public function addCookie(Cookie $cookie)
+    public function addCookie(Cookie $cookie): self
     {
         $name = $cookie->getName();
         $value = $cookie->getValue();
@@ -130,7 +127,7 @@ final class Response
     /**
      * @return string
      */
-    public function getContentType()
+    public function getContentType(): string
     {
         return $this->parseHeader()->get('Content-Type');
     }
@@ -139,7 +136,7 @@ final class Response
      * @param array $headers
      * @return $this
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): self
     {
         foreach ($headers as $name => $value)
             $this->setHeader($name, $value);
@@ -149,7 +146,7 @@ final class Response
     /**
      * @param string $location
      */
-    public function sendLocation($location)
+    public function sendLocation(string $location)
     {
         $this->setHeader('Location', $location);
         exit();

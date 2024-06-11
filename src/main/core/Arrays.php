@@ -8,9 +8,7 @@
 
 namespace lanlj\fw\core;
 
-use lanlj\fw\json\Json;
-use lanlj\fw\util\ArrayUtil;
-use lanlj\fw\util\Utils;
+use lanlj\fw\util\{ArrayUtil, JsonUtil, Utils};
 use ReflectionException;
 use ReflectionFunction;
 
@@ -19,7 +17,7 @@ final class Arrays
     /**
      * @var array
      */
-    private $array;
+    private array $array;
 
     /**
      * Arrays constructor.
@@ -34,15 +32,15 @@ final class Arrays
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return Json::toJsonString($this->array);
+        return JsonUtil::toJsonString($this->array);
     }
 
     /**
      * @return array
      */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->array;
     }
@@ -51,7 +49,7 @@ final class Arrays
      * @param string $rootNode
      * @return string
      */
-    public function toXML($rootNode = "xml")
+    public function toXML(string $rootNode = "xml"): string
     {
         return ArrayUtil::toXML($this->array, null, null, [ArrayUtil::XML_ROOT => $rootNode]);
     }
@@ -62,13 +60,11 @@ final class Arrays
      * @param bool $regex
      * @return bool
      */
-    public function contains($needle, $strict = false, $regex = false)
+    public function contains($needle, bool $strict = false, bool $regex = false): bool
     {
-        if (!$regex)
-            return in_array($needle, $this->array, $strict);
+        if (!$regex) return in_array($needle, $this->array, $strict);
         foreach ($this->array as $value) {
-            if (preg_match($needle, $value))
-                return true;
+            if (preg_match($needle, $value)) return true;
         }
         return false;
     }
@@ -78,7 +74,7 @@ final class Arrays
      * @param int|string $key
      * @return $this
      */
-    public function add($value, $key = null)
+    public function add($value, $key = null): self
     {
         if ($key && (is_numeric($key) || is_string($key)))
             $this->array[$key] = $value;
@@ -91,7 +87,7 @@ final class Arrays
      * @param array $array
      * @return $this
      */
-    public function addAll(array $array)
+    public function addAll(array $array): self
     {
         $this->array = $array + $this->array;
         return $this;
@@ -102,12 +98,10 @@ final class Arrays
      * @param bool $keyArray
      * @return $this
      */
-    public function removeAll(array $array, $keyArray = true)
+    public function removeAll(array $array, bool $keyArray = true): self
     {
-        if ($keyArray)
-            $this->array = array_diff_key($this->array, $array);
-        else
-            $this->array = array_diff($this->array, $array);
+        if ($keyArray) $this->array = array_diff_key($this->array, $array);
+        else $this->array = array_diff($this->array, $array);
         return $this;
     }
 
@@ -115,7 +109,7 @@ final class Arrays
      * @param int|string $index
      * @return $this
      */
-    public function remove($index)
+    public function remove($index): self
     {
         unset($this->array[$index]);
         return $this;
@@ -124,7 +118,7 @@ final class Arrays
     /**
      * @return $this
      */
-    public function clear()
+    public function clear(): self
     {
         $this->array = array();
         return $this;
@@ -135,7 +129,7 @@ final class Arrays
      * @param bool $strict
      * @return int|string
      */
-    public function indexOf($needle, $strict = null)
+    public function indexOf($needle, bool $strict = null)
     {
         return ($index = array_search($needle, $this->array, $strict)) === false ? -1 : $index;
     }
@@ -145,7 +139,7 @@ final class Arrays
      * @param bool $strict
      * @return int|string
      */
-    public function lastIndexOf($needle, $strict = null)
+    public function lastIndexOf($needle, bool $strict = null)
     {
         $arr = new self(array_keys($this->array, $needle, $strict));
         return $arr->get($arr->size() - 1, -1);
@@ -165,7 +159,7 @@ final class Arrays
     /**
      * @return int
      */
-    public function size()
+    public function size(): int
     {
         return count($this->array);
     }
@@ -173,7 +167,7 @@ final class Arrays
     /**
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->size() == 0;
     }
@@ -181,7 +175,7 @@ final class Arrays
     /**
      * @return Arrays
      */
-    public function getKeys()
+    public function getKeys(): self
     {
         return new self(array_keys($this->array));
     }
@@ -189,7 +183,7 @@ final class Arrays
     /**
      * @return Arrays
      */
-    public function getValues()
+    public function getValues(): self
     {
         return new self(array_values($this->array));
     }
@@ -199,7 +193,7 @@ final class Arrays
      * @param string $numeric_prefix 参数名为数字时的前缀
      * @return string
      */
-    public function toQueryString($arg_separator = '&', $numeric_prefix = null)
+    public function toQueryString(string $arg_separator = '&', string $numeric_prefix = null): string
     {
         return urldecode(http_build_query($this->array, $numeric_prefix, $arg_separator));
     }
@@ -208,7 +202,7 @@ final class Arrays
      * @param string $delimiter
      * @return string
      */
-    public function concatByCustom($delimiter = '&')
+    public function concatByCustom(string $delimiter = '&'): string
     {
         $str = new Strings();
         foreach ($this->array as $item) {

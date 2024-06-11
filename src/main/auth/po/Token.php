@@ -6,82 +6,107 @@
  * Time: 20:10
  */
 
-namespace lanlj\fw\auth;
+namespace lanlj\fw\auth\po;
 
 use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
 use lanlj\fw\util\Utils;
 
-final class Token implements BeanMapping
+class Token implements BeanMapping
 {
     /**
      * ID
      * @var string
      */
-    private $id;
+    private ?string $id;
+
+    /**
+     * @var string
+     */
+    private ?string $token;
 
     /**
      * 授权对象
      * @var Account
+     * @column("account_id")
      */
-    private $account;
+    private ?Account $account;
 
     /**
      * 失效时间
      * @var string
      */
-    private $expires;
+    private ?string $expires;
 
     /**
      * Token constructor.
      * @param string $id
+     * @param string $token
      * @param Account $account
      * @param string $expires
      */
-    public function __construct($id = null, $expires = null, Account $account = null)
+    public function __construct(string $id = null, string $token = null, Account $account = null, string $expires = null)
     {
         $this->id = $id;
-        $this->expires = $expires;
+        $this->token = $token;
         $this->account = $account;
+        $this->expires = $expires;
     }
 
     /**
      * @param object|array $values
-     * @return $this
+     * @return self
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
         if ($values instanceof self)
             return $values;
         $values = new Arrays($values);
         return new self(
             $values->get('id'),
-            $values->get('expires'),
-            Account::mapping(['id' => $values->get('account')])
+            $values->get('token'),
+            Account::mapping(['id' => $values->get('account_id')]),
+            $values->get('expires')
         );
     }
 
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): ?string
     {
-        if (is_null($this->id)) $this->id = Utils::guid();
         return $this->id;
     }
 
     /**
      * @param string $id
      */
-    public function setId($id)
+    public function setId(string $id)
     {
         $this->id = $id;
     }
 
     /**
+     * @return string
+     */
+    public function getToken(): string
+    {
+        if (is_null($this->token)) $this->token = Utils::guid();
+        return $this->token;
+    }
+
+    /**
+     * @param string $token
+     */
+    public function setToken(string $token): void
+    {
+        $this->token = $token;
+    }
+
+    /**
      * @return Account
      */
-    public function getAccount()
+    public function getAccount(): ?Account
     {
         return $this->account;
     }
@@ -97,7 +122,7 @@ final class Token implements BeanMapping
     /**
      * @return string
      */
-    public function getExpires()
+    public function getExpires(): string
     {
         if (is_null($this->expires)) $this->expires = time() + 86400;
         return $this->expires;
@@ -106,7 +131,7 @@ final class Token implements BeanMapping
     /**
      * @param string $expires
      */
-    public function setExpires($expires)
+    public function setExpires(string $expires)
     {
         $this->expires = $expires;
     }

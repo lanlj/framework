@@ -8,14 +8,14 @@
 
 namespace lanlj\fw\util;
 
-final class CurlUtil
+class CurlUtil
 {
     /**
      * 解析头部字符串
      * @param string $header
      * @return array
      */
-    public static function parseHeader($header)
+    public static function parseHeader(?string $header): array
     {
         $headArr = explode(PHP_EOL, $header);
         $headers = array();

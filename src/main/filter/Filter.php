@@ -9,8 +9,7 @@
 
 namespace lanlj\fw\filter;
 
-use lanlj\fw\http\Request;
-use lanlj\fw\http\Response;
+use lanlj\fw\http\{Request, Response};
 
 interface Filter
 {
@@ -18,5 +17,5 @@ interface Filter
      * @param Request $request
      * @param Response $response
      */
-    public function doFilter(Request $request, Response $response);
+    public function doFilter(Request $request, Response $response): void;
 }

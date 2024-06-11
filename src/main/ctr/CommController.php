@@ -9,28 +9,26 @@
 namespace lanlj\fw\ctr;
 
 use lanlj\fw\app\Application;
-use lanlj\fw\http\cURL\Curl;
-use lanlj\fw\http\cURL\UniCurl;
-use lanlj\fw\http\Request;
-use lanlj\fw\http\Response;
+use lanlj\fw\http\{Request, Response};
+use lanlj\fw\http\cURL\{Curl, UniCurl};
 
 abstract class CommController implements Controller
 {
     /**
      * 对象实例
-     * @var Controller
+     * @var self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * @var Request
      */
-    protected $req = null;
+    protected ?Request $req = null;
 
     /**
      * @var Response
      */
-    protected $resp = null;
+    protected ?Response $resp = null;
 
     /**
      * CommController constructor.
@@ -54,9 +52,9 @@ abstract class CommController implements Controller
 
     /**
      * 获取对象实例
-     * @return CommController
+     * @return self
      */
-    public static final function getInstance()
+    public static final function getInstance(): self
     {
         if (is_null(self::$_instance) || !isset(self::$_instance)) {
             self::$_instance = new static();
@@ -69,7 +67,7 @@ abstract class CommController implements Controller
      * @param string $url
      * @return UniCurl
      */
-    protected final function getCurl($url)
+    protected final function getCurl(?string $url): UniCurl
     {
         return new UniCurl(
             (new Curl())->setUrl($url)
@@ -82,9 +80,9 @@ abstract class CommController implements Controller
     /**
      * @param string $name
      * @param mixed $default
-     * @return string
+     * @return mixed
      */
-    protected final function getParam($name, $default = null)
+    protected final function getParam(?string $name, $default = null)
     {
         return $this->req->getParam($name, $default);
     }
@@ -94,7 +92,7 @@ abstract class CommController implements Controller
      * @param mixed $default
      * @return array
      */
-    protected final function getParams($name, $default = null)
+    protected final function getParams(?string $name, $default = null): array
     {
         return $this->req->getParams($name, $default);
     }

@@ -16,12 +16,12 @@ class Mapper implements BeanMapping
     /**
      * @var string
      */
-    private static $reqPath;
+    private static string $reqPath;
 
     /**
      * @var string
      */
-    private static $defaultNS;
+    private static string $defaultNS;
 
     /**
      * @var string|array
@@ -31,12 +31,12 @@ class Mapper implements BeanMapping
     /**
      * @var string
      */
-    private $name;
+    private ?string $name;
 
     /**
      * @var string
      */
-    private $filePath;
+    private ?string $filePath;
 
     /**
      * @var string|array
@@ -51,7 +51,7 @@ class Mapper implements BeanMapping
     /**
      * @var string
      */
-    private $namespace;
+    private ?string $namespace;
 
     /**
      * @var string|array
@@ -61,20 +61,23 @@ class Mapper implements BeanMapping
     /**
      * @var string
      */
-    private $scope;
+    private ?string $scope;
 
     /**
      * Mapper constructor.
      * @param array|string $path
      * @param string $name
      * @param string $filePath
-     * @param string $params
+     * @param array|string $params
      * @param array|string $requires
      * @param string $namespace
      * @param array|string $initParams
      * @param string $scope
      */
-    public function __construct($path = null, $name = null, $filePath = null, $params = null, $requires = null, $namespace = null, $initParams = null, $scope = null)
+    public function __construct(
+        $path = null, string $name = null, string $filePath = null, $params = null,
+        $requires = null, string $namespace = null, $initParams = null, string $scope = null
+    )
     {
         $this->path = $path;
         $this->name = $name;
@@ -90,7 +93,7 @@ class Mapper implements BeanMapping
      * @param object|array $values
      * @return $this
      */
-    public static function mapping($values)
+    public static function mapping($values): self
     {
         if ($values instanceof self)
             return $values;
@@ -110,7 +113,7 @@ class Mapper implements BeanMapping
     /**
      * @param string $reqPath
      */
-    public static function setReqPath($reqPath)
+    public static function setReqPath(string $reqPath)
     {
         self::$reqPath = $reqPath;
     }
@@ -118,7 +121,7 @@ class Mapper implements BeanMapping
     /**
      * @param string $defaultNS
      */
-    public static function setDefaultNS($defaultNS)
+    public static function setDefaultNS(string $defaultNS)
     {
         self::$defaultNS = $defaultNS;
     }
@@ -126,7 +129,7 @@ class Mapper implements BeanMapping
     /**
      * @return array
      */
-    public function getPath()
+    public function getPath(): array
     {
         return is_array($this->path) ? $this->path : [$this->path];
     }
@@ -135,7 +138,7 @@ class Mapper implements BeanMapping
      * @param array|string $path
      * @return $this
      */
-    public function setPath($path)
+    public function setPath($path): self
     {
         $this->path = $path;
         return $this;
@@ -144,7 +147,7 @@ class Mapper implements BeanMapping
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -153,7 +156,7 @@ class Mapper implements BeanMapping
      * @param string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
@@ -162,7 +165,7 @@ class Mapper implements BeanMapping
     /**
      * @return string
      */
-    public function getFilePath()
+    public function getFilePath(): ?string
     {
         return $this->filePath;
     }
@@ -171,7 +174,7 @@ class Mapper implements BeanMapping
      * @param string $filePath
      * @return $this
      */
-    public function setFilePath($filePath)
+    public function setFilePath(?string $filePath): self
     {
         $this->filePath = $filePath;
         return $this;
@@ -180,7 +183,7 @@ class Mapper implements BeanMapping
     /**
      * @return array
      */
-    public function getParams()
+    public function getParams(): array
     {
         if (is_array($this->params)) return $this->params;
         $ps = @preg_replace($this->path, $this->params, self::$reqPath);
@@ -192,7 +195,7 @@ class Mapper implements BeanMapping
      * @param array|string $params
      * @return $this
      */
-    public function setParams($params)
+    public function setParams($params): self
     {
         $this->params = $params;
         return $this;
@@ -201,7 +204,7 @@ class Mapper implements BeanMapping
     /**
      * @return array
      */
-    public function getRequires()
+    public function getRequires(): array
     {
         return is_array($this->requires) ? $this->requires : [$this->requires];
     }
@@ -210,7 +213,7 @@ class Mapper implements BeanMapping
      * @param array|string $requires
      * @return $this
      */
-    public function setRequires($requires)
+    public function setRequires($requires): self
     {
         $this->requires = $requires;
         return $this;
@@ -219,7 +222,7 @@ class Mapper implements BeanMapping
     /**
      * @return string
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         if (is_string($this->namespace)) return $this->namespace;
         $name = is_string($this->name) ? $this->name : self::$reqPath;
@@ -230,7 +233,7 @@ class Mapper implements BeanMapping
      * @param string $namespace
      * @return $this
      */
-    public function setNamespace($namespace)
+    public function setNamespace(string $namespace): self
     {
         $this->namespace = $namespace;
         return $this;
@@ -239,7 +242,7 @@ class Mapper implements BeanMapping
     /**
      * @return array
      */
-    public function getInitParams()
+    public function getInitParams(): array
     {
         if (is_array($this->initParams)) return $this->initParams;
         parse_str($this->initParams, $params);
@@ -250,7 +253,7 @@ class Mapper implements BeanMapping
      * @param array|string $initParams
      * @return $this
      */
-    public function setInitParams($initParams)
+    public function setInitParams($initParams): self
     {
         $this->initParams = $initParams;
         return $this;
@@ -259,7 +262,7 @@ class Mapper implements BeanMapping
     /**
      * @return string
      */
-    public function getScope()
+    public function getScope(): ?string
     {
         return $this->scope;
     }
@@ -268,7 +271,7 @@ class Mapper implements BeanMapping
      * @param string $scope
      * @return $this
      */
-    public function setScope($scope)
+    public function setScope(?string $scope): self
     {
         $this->scope = $scope;
         return $this;

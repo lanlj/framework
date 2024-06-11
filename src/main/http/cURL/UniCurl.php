@@ -16,13 +16,13 @@ final class UniCurl
      * cURL配置
      * @var Curl
      */
-    private $curl = null;
+    private ?Curl $curl;
 
     /**
      * cURL句柄信息
      * @var array
      */
-    private $cURLInfo = null;
+    private ?array $cURLInfo = null;
 
     /**
      * UniCurl constructor.
@@ -36,7 +36,7 @@ final class UniCurl
     /**
      * @return Curl
      */
-    public function getCurl()
+    public function getCurl(): Curl
     {
         return $this->curl;
     }
@@ -45,7 +45,7 @@ final class UniCurl
      * @param Curl $curl
      * @return $this
      */
-    public function setCurl(Curl $curl)
+    public function setCurl(Curl $curl): self
     {
         $this->curl = $curl;
         return $this;
@@ -54,7 +54,7 @@ final class UniCurl
     /**
      * @return array
      */
-    public function getCURLInfo()
+    public function getCURLInfo(): array
     {
         return $this->cURLInfo;
     }
@@ -71,7 +71,7 @@ final class UniCurl
      * 执行GET操作
      * @return array
      */
-    public function get()
+    public function get(): array
     {
         return $this->exec($this->curl->get());
     }
@@ -81,7 +81,7 @@ final class UniCurl
      * @param resource $ch
      * @return array
      */
-    private function exec($ch)
+    private function exec($ch): array
     {
         $r = curl_exec($ch);
         $err_no = curl_errno($ch);
@@ -108,7 +108,7 @@ final class UniCurl
      * 执行POST操作
      * @return array
      */
-    public function post()
+    public function post(): array
     {
         return $this->exec($this->curl->post());
     }
@@ -117,7 +117,7 @@ final class UniCurl
      * 执行POST FILE操作
      * @return array
      */
-    public function postFile()
+    public function postFile(): array
     {
         return $this->exec($this->curl->postFile());
     }
@@ -126,7 +126,7 @@ final class UniCurl
      * 执行SAFE POST FILE操作
      * @return array
      */
-    public function postFileSafety()
+    public function postFileSafety(): array
     {
         return $this->exec($this->curl->postFileSafety());
     }
@@ -135,7 +135,7 @@ final class UniCurl
      * 执行HEAD操作
      * @return array
      */
-    public function head()
+    public function head(): array
     {
         return $this->exec($this->curl->head());
     }

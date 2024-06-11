@@ -8,10 +8,9 @@
 
 namespace lanlj\fw\util;
 
-use lanlj\fw\http\cURL\Curl;
-use lanlj\fw\http\cURL\UniCurl;
+use lanlj\fw\http\cURL\{Curl, UniCurl};
 
-final class FileUtil
+class FileUtil
 {
     /**
      * 创建多级文件夹/目录
@@ -19,7 +18,7 @@ final class FileUtil
      * @param int $mode
      * @return bool
      */
-    public static function mkDirs($dir, $mode = 0777)
+    public static function mkDirs(string $dir, int $mode = 0777): bool
     {
         if (is_dir($dir) || @mkdir($dir, $mode)) return TRUE;
         if (!self::mkdirs(dirname($dir), $mode)) return FALSE;
@@ -29,9 +28,9 @@ final class FileUtil
     /**
      * 获取文件名（支持中文）
      * @param string $path
-     * @return mixed
+     * @return string
      */
-    public static function basename($path)
+    public static function basename(?string $path): ?string
     {
         $arr = explode("/", $path);
         return array_pop($arr);
@@ -43,7 +42,7 @@ final class FileUtil
      * @param bool $get_headers
      * @return bool
      */
-    public static function remoteFileExists($url, $get_headers = false)
+    public static function remoteFileExists(string $url, bool $get_headers = false): bool
     {
         if ($get_headers)
             return get_headers($url)[0] == 'HTTP/1.1 200 OK';

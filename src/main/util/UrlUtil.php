@@ -9,14 +9,14 @@
 
 namespace lanlj\fw\util;
 
-final class UrlUtil
+class UrlUtil
 {
     /**
      * @param string $path
      * @param bool $first
      * @return string
      */
-    public static function fixPath($path, $first = false)
+    public static function fixPath(?string $path, bool $first = false): ?string
     {
         return preg_replace('/[\/]{2,}/', '/', $path, $first ? 1 : -1);
     }

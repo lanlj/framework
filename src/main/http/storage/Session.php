@@ -8,29 +8,31 @@
 
 namespace lanlj\fw\http\storage;
 
+use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\core\Arrays;
 
-final class Session
+final class Session implements BeanInstance
 {
     /**
-     * @var Session
+     * @var self
      */
-    private static $_instance = null;
+    private static ?self $_instance = null;
 
     /**
      * Session constructor.
      * @param int $cacheExpire
      */
-    private function __construct($cacheExpire = 180)
+    private function __construct(int $cacheExpire = 180)
     {
         session_cache_expire($cacheExpire);
         session_start();
     }
 
     /**
-     * @return Session
+     * @param mixed ...$_
+     * @return self
      */
-    public static function getInstance()
+    public static function newInstance(...$_): self
     {
         if (is_null(self::$_instance) || !isset(self::$_instance)) {
             self::$_instance = new self();
@@ -42,7 +44,7 @@ final class Session
      * @param string $name
      * @return mixed
      */
-    public function getAttribute($name)
+    public function getAttribute(?string $name)
     {
         return (new Arrays($_SESSION))->get($name);
     }
@@ -51,7 +53,7 @@ final class Session
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(?string $name, $value): void
     {
         $_SESSION = (new Arrays($_SESSION))->add($value, $name)->getArray();
     }
@@ -59,7 +61,7 @@ final class Session
     /**
      * @return Arrays
      */
-    public function getAttributeNames()
+    public function getAttributeNames(): Arrays
     {
         return (new Arrays($_SESSION))->getKeys();
     }
@@ -67,7 +69,7 @@ final class Session
     /**
      * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute(?string $name)
     {
         unset($_SESSION[$name]);
     }
@@ -75,7 +77,7 @@ final class Session
     /**
      * @return int
      */
-    public function getCacheExpire()
+    public function getCacheExpire(): int
     {
         return session_cache_expire();
     }
@@ -83,7 +85,7 @@ final class Session
     /**
      * @param int $min
      */
-    public function setCacheExpire($min)
+    public function setCacheExpire(int $min)
     {
         session_destroy();
         self::$_instance = new self($min);
@@ -92,7 +94,7 @@ final class Session
     /**
      * 清空所有会话数据
      */
-    public function invalidate()
+    public function invalidate(): void
     {
         session_unset();
     }

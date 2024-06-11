@@ -10,14 +10,14 @@ namespace lanlj\fw\util;
 
 use stdClass;
 
-final class XMLUtil
+class XMLUtil
 {
     /**
      * 将xml内容转换为数组
      * @param string $xml xml文本
      * @return array
      */
-    public static function toArray($xml)
+    public static function toArray(?string $xml): ?array
     {
         return json_decode(self::parseXML($xml), true);
     }
@@ -27,7 +27,7 @@ final class XMLUtil
      * @param string $xml xml文本
      * @return string
      */
-    private static function parseXML($xml)
+    private static function parseXML(?string $xml): ?string
     {
         //考虑到xml文档中可能会包含<![CDATA[]]>标签，第三个参数设置为LIBXML_NOCDATA
         libxml_disable_entity_loader(true);
@@ -40,7 +40,7 @@ final class XMLUtil
      * @param string $xml xml文本
      * @return stdClass
      */
-    public static function toObject($xml)
+    public static function toObject(?string $xml): ?object
     {
         return json_decode(self::parseXML($xml));
     }

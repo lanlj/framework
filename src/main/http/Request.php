@@ -8,10 +8,8 @@
 
 namespace lanlj\fw\http;
 
-use lanlj\fw\core\Arrays;
-use lanlj\fw\core\Strings;
-use lanlj\fw\http\storage\Cookie;
-use lanlj\fw\http\storage\Session;
+use lanlj\fw\core\{Arrays, Strings};
+use lanlj\fw\http\storage\{Cookie, Session};
 use lanlj\fw\http\url\Url;
 
 final class Request
@@ -26,12 +24,12 @@ final class Request
     /**
      * @var array
      */
-    private static $params = [];
+    private static array $params = [];
 
     /**
      * @var Arrays
      */
-    private $attributes;
+    private Arrays $attributes;
 
     /**
      * Request constructor.
@@ -53,7 +51,7 @@ final class Request
      * @param string $name
      * @return mixed
      */
-    public function getAttribute($name)
+    public function getAttribute(?string $name)
     {
         return $this->attributes->get($name);
     }
@@ -62,7 +60,7 @@ final class Request
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(?string $name, $value)
     {
         $this->attributes->add($value, $name);
     }
@@ -73,7 +71,7 @@ final class Request
      * @param mixed $default
      * @return mixed
      */
-    public function getParam($name, $default = null)
+    public function getParam(?string $name, $default = null)
     {
         $params = $this->getParamList();
         $r = $params->get($name, $default);
@@ -88,7 +86,7 @@ final class Request
      * 获取参数列表
      * @return Arrays
      */
-    public function getParamList()
+    public function getParamList(): Arrays
     {
         $arrays = new Arrays($_GET);
         $params_list = (new Url($this->getRequestURI()))->get(Url::QUERY);
@@ -109,7 +107,7 @@ final class Request
     /**
      * @return string
      */
-    public function getRequestURI()
+    public function getRequestURI(): string
     {
         return $_SERVER['REQUEST_URI'];
     }
@@ -120,7 +118,7 @@ final class Request
      * @param mixed $default
      * @return array
      */
-    public function getParams($name, $default = null)
+    public function getParams(?string $name, $default = null): array
     {
         $params = $this->getParamList();
         $r = $params->get($name, $default);
@@ -132,7 +130,7 @@ final class Request
      * @param string $name
      * @return mixed
      */
-    public function getCookie($name)
+    public function getCookie(?string $name)
     {
         return $this->getCookies()->get($name);
     }
@@ -141,7 +139,7 @@ final class Request
      * 获取所有Cookie
      * @return Arrays
      */
-    public function getCookies()
+    public function getCookies(): Arrays
     {
         return new Arrays($_COOKIE);
     }
@@ -149,7 +147,7 @@ final class Request
     /**
      * 移除所有Cookie
      */
-    public function removeCookies()
+    public function removeCookies(): void
     {
         foreach ($_COOKIE as $key => $value)
             $this->removeCookie($key);
@@ -160,7 +158,7 @@ final class Request
      * @param string $name
      * @param Cookie $cookie
      */
-    public function removeCookie($name, Cookie $cookie = null)
+    public function removeCookie(?string $name, Cookie $cookie = null)
     {
         $uc = false;
         if (!is_null($cookie)) {
@@ -179,7 +177,7 @@ final class Request
      * @param string $s
      * @return mixed
      */
-    public function getHeader($s)
+    public function getHeader(?string $s)
     {
         return $this->parseHeader()->get($s);
     }
@@ -188,7 +186,7 @@ final class Request
      * 解析请求头部信息
      * @return Arrays
      */
-    private function parseHeader()
+    private function parseHeader(): Arrays
     {
         if (!function_exists('getallheaders')) {
             $headers = array();
@@ -216,7 +214,7 @@ final class Request
      * 获取所有请求头名
      * @return Arrays
      */
-    public function getHeaderNames()
+    public function getHeaderNames(): Arrays
     {
         return $this->parseHeader()->getKeys();
     }
@@ -225,7 +223,7 @@ final class Request
      * 获取字符串请求参数
      * @return string
      */
-    public function getQueryString()
+    public function getQueryString(): string
     {
         return $_SERVER['QUERY_STRING'];
     }
@@ -233,7 +231,7 @@ final class Request
     /**
      * @return string
      */
-    public function getRequestURL()
+    public function getRequestURL(): string
     {
         return (new Strings($this->getScheme()))
             ->concat('://')
@@ -247,7 +245,7 @@ final class Request
     /**
      * @return string
      */
-    public function getScheme()
+    public function getScheme(): string
     {
         return $_SERVER['REQUEST_SCHEME'];
     }
@@ -255,7 +253,7 @@ final class Request
     /**
      * @return string
      */
-    public function getServerName()
+    public function getServerName(): string
     {
         return $_SERVER['SERVER_NAME'];
     }
@@ -263,7 +261,7 @@ final class Request
     /**
      * @return string
      */
-    public function getServerPort()
+    public function getServerPort(): string
     {
         return $_SERVER['SERVER_PORT'];
     }
@@ -271,7 +269,7 @@ final class Request
     /**
      * @return Arrays
      */
-    public function getAttributeNames()
+    public function getAttributeNames(): Arrays
     {
         return $this->attributes->getKeys();
     }
@@ -279,7 +277,7 @@ final class Request
     /**
      * @return Arrays
      */
-    public function getParamNames()
+    public function getParamNames(): Arrays
     {
         return $this->getParamList()->getKeys();
     }
@@ -287,14 +285,14 @@ final class Request
     /**
      * @return Session
      */
-    public function getSession()
+    public function getSession(): Session
     {
-        return Session::getInstance();
+        return Session::newInstance();
     }
 
     /**
      * 指定请求方式
-     * @param array ...$methods
+     * @param mixed ...$methods
      */
     public function requestMethods(...$methods)
     {
@@ -306,7 +304,7 @@ final class Request
      * 获取请求方式
      * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
@@ -315,7 +313,7 @@ final class Request
      * 获取请求体
      * @return string
      */
-    public function getRequestBody()
+    public function getRequestBody(): string
     {
         return file_get_contents('php://input');
     }
