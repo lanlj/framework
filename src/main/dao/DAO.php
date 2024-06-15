@@ -85,9 +85,9 @@ class DAO
      * @param string $columnFields
      * @param string|null $class
      * @param mixed ...$conditions
-     * @return array
+     * @return array|null
      */
-    public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): array
+    public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): ?array
     {
         $results = $this->dbo->select($this->table, $columnFields, ...$conditions);
         return DBUtil::toClassObject($results, $class, true);
@@ -121,9 +121,9 @@ class DAO
      * @param string $sql
      * @param string|null $class
      * @param mixed ...$parameters
-     * @return array
+     * @return array|null
      */
-    public function getList(string $sql, string $class = null, ...$parameters): array
+    public function getList(string $sql, string $class = null, ...$parameters): ?array
     {
         return DBUtil::toClassObject($this->dbo->get_results(DBUtil::buildSQL($sql, ...$parameters)), $class, true);
     }
