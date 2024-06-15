@@ -13,7 +13,7 @@ interface Controller
 {
     /**
      * 逻辑服务
-     * @return int
+     * @return int HTTP状态码
      */
     public function service(): int;
 }

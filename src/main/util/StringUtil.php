@@ -14,7 +14,7 @@ class StringUtil
 {
     /**
      * 字符串是否base64编码
-     * @param string $str
+     * @param string|null $str
      * @return bool
      */
     public static function isBase64(?string $str): bool
@@ -27,7 +27,7 @@ class StringUtil
      * @param bool $json
      * @return string
      */
-    public static function toString($var, bool $json = false): ?string
+    public static function toString($var, bool $json = false): string
     {
         $s = null;
         $oa = null;

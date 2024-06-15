@@ -12,11 +12,11 @@ namespace lanlj\fw\util;
 class UrlUtil
 {
     /**
-     * @param string $path
+     * @param string|null $path
      * @param bool $first
      * @return string
      */
-    public static function fixPath(?string $path, bool $first = false): ?string
+    public static function fixPath(?string $path, bool $first = false): string
     {
         return preg_replace('/[\/]{2,}/', '/', $path, $first ? 1 : -1);
     }

@@ -17,72 +17,71 @@ class HttpError implements BeanMapping
     /**
      * @var string
      */
-    private ?string $err_header;
+    private string $errHeader;
 
     /**
      * @var string
      */
-    private ?string $err_message;
+    private string $errMessage;
 
     /**
      * Error constructor.
-     * @param string $err_header
-     * @param string $err_message
+     * @param string $errHeader
+     * @param string $errMessage
      */
-    public function __construct(string $err_header = null, string $err_message = null)
+    public function __construct(string $errHeader, string $errMessage)
     {
-        $this->err_header = $err_header;
-        $this->err_message = $err_message;
+        $this->errHeader = $errHeader;
+        $this->errMessage = $errMessage;
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
+        if ($args instanceof self) return $args;
+        $args = new Arrays($args);
         return new self(
-            $values->get('err_header'),
-            $values->get('err_message')
+            $args->get('errHeader'),
+            $args->get('errMessage')
         );
     }
 
     /**
      * @return string
      */
-    public function getErrHeader(): ?string
+    public function getErrHeader(): string
     {
-        return $this->err_header;
+        return $this->errHeader;
     }
 
     /**
-     * @param string $err_header
+     * @param string $errHeader
      * @return self
      */
-    public function setErrHeader(string $err_header): self
+    public function setErrHeader(string $errHeader): self
     {
-        $this->err_header = $err_header;
+        $this->errHeader = $errHeader;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getErrMessage(): ?string
+    public function getErrMessage(): string
     {
-        return $this->err_message;
+        return $this->errMessage;
     }
 
     /**
-     * @param string $err_message
+     * @param string
      * @return self
      */
-    public function setErrMessage(string $err_message): self
+    public function setErrMessage(string $errMessage): self
     {
-        $this->err_message = $err_message;
+        $this->errMessage = $errMessage;
         return $this;
     }
 }

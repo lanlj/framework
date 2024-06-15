@@ -18,17 +18,17 @@ abstract class CommController implements Controller
      * 对象实例
      * @var self
      */
-    private static ?self $_instance = null;
+    private static self $_instance;
 
     /**
      * @var Request
      */
-    protected ?Request $req = null;
+    protected Request $req;
 
     /**
      * @var Response
      */
-    protected ?Response $resp = null;
+    protected Response $resp;
 
     /**
      * CommController constructor.
@@ -42,7 +42,7 @@ abstract class CommController implements Controller
      * 初始化配置
      * @return void
      */
-    protected function init()
+    protected function init(): void
     {
         $this->req = Application::getRequest();
         $this->resp = Application::getResponse();
@@ -56,10 +56,7 @@ abstract class CommController implements Controller
      */
     public static final function getInstance(): self
     {
-        if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            self::$_instance = new static();
-        }
-        return self::$_instance;
+        return self::$_instance ?? self::$_instance = new static();
     }
 
     /**
@@ -67,7 +64,7 @@ abstract class CommController implements Controller
      * @param string $url
      * @return UniCurl
      */
-    protected final function getCurl(?string $url): UniCurl
+    protected final function getCurl(string $url): UniCurl
     {
         return new UniCurl(
             (new Curl())->setUrl($url)
@@ -82,7 +79,7 @@ abstract class CommController implements Controller
      * @param mixed $default
      * @return mixed
      */
-    protected final function getParam(?string $name, $default = null)
+    protected final function getParam(string $name, $default = null)
     {
         return $this->req->getParam($name, $default);
     }
@@ -92,25 +89,29 @@ abstract class CommController implements Controller
      * @param mixed $default
      * @return array
      */
-    protected final function getParams(?string $name, $default = null): array
+    protected final function getParams(string $name, $default = null): array
     {
         return $this->req->getParams($name, $default);
     }
 
     /**
      * 只允许GET请求
+     * @param bool $output
+     * @return string|null
      */
-    protected final function onlyGET()
+    protected function onlyGET(bool $output = true): ?string
     {
-        $this->req->requestMethods(Request::GET);
+        return $this->req->requestMethods($output, Request::GET);
     }
 
     /**
      * 只允许POST请求
+     * @param bool $output
+     * @return string|null
      */
-    protected final function onlyPOST()
+    protected function onlyPOST(bool $output = true): ?string
     {
-        $this->req->requestMethods(Request::POST);
+        return $this->req->requestMethods($output, Request::POST);
     }
 
     private function __clone()

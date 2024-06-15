@@ -27,8 +27,8 @@ class FileUtil
 
     /**
      * 获取文件名（支持中文）
-     * @param string $path
-     * @return string
+     * @param string|null $path
+     * @return string|null
      */
     public static function basename(?string $path): ?string
     {

@@ -9,10 +9,11 @@
 namespace lanlj\fw\app;
 
 use lanlj\fw\bean\BeanInstance;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\core\{Arrays, Strings};
 use lanlj\fw\db\DB;
 use lanlj\fw\filter\Filter;
 use lanlj\fw\http\{Request, Response};
+use lanlj\fw\proxy\SqlLogProxy;
 use lanlj\fw\util\{BeanUtil, JsonUtil, UrlUtil, Utils, XMLUtil};
 
 class Application implements BeanInstance
@@ -20,7 +21,7 @@ class Application implements BeanInstance
     /**
      * @var string 配置文件路径
      */
-    public static string $configPath = "./src/resources/application.xml";
+    protected static string $configPath = "./src/resources/application.xml";
 
     /**
      * @var Arrays
@@ -33,6 +34,11 @@ class Application implements BeanInstance
     protected static Arrays $properties;
 
     /**
+     * @var DB|null
+     */
+    private static ?DB $_db = null;
+
+    /**
      * @var bool
      */
     private static bool $_started = false;
@@ -40,20 +46,20 @@ class Application implements BeanInstance
     /**
      * @var Application
      */
-    private static ?self $_instance = null;
+    private static self $_instance;
 
     /**
      * @var Request
      */
-    private static ?Request $_request = null;
+    private static Request $_request;
 
     /**
      * @var Response
      */
-    private static ?Response $_response = null;
+    private static Response $_response;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $appClass;
 
@@ -72,15 +78,15 @@ class Application implements BeanInstance
             $this->appClass = $appConfig->get("@attributes")["class"];
 
             $filters = self::$sysConfig->get("filters", []);
-            $filters = $this->arrPackage(Utils::getDefault($filters, "filter"));
+            $filters = $this->arrPackage(Utils::getDefault($filters, "filter", []));
             self::$sysConfig->add($filters, "filters");
 
             $propFiles = self::$sysConfig->get("prop-files", []);
-            $propFiles = $this->arrPackage(Utils::getDefault($propFiles, "prop-file"));
+            $propFiles = $this->arrPackage(Utils::getDefault($propFiles, "prop-file", []));
             self::$sysConfig->add($propFiles, "prop-files");
 
             foreach ($propFiles as $propFile) {
-                $attrs = Utils::getDefault($propFile, "@attributes");
+                $attrs = Utils::getDefault($propFile, "@attributes", []);
                 if (is_file($filename = $attrs["path"])) {
                     $props = file_get_contents($filename);
                     $type = $attrs["type"];
@@ -88,7 +94,7 @@ class Application implements BeanInstance
                         case "xml":
                             $props = XMLUtil::toArray($props);
                             break;
-                        default:
+                        case "json":
                             $props = JsonUtil::toJson($props, true);
                             break;
                     }
@@ -102,6 +108,9 @@ class Application implements BeanInstance
             foreach ($filters as $filter) {
                 $filter->doFilter($request, $response);
             }
+
+            $this->initSqlLogProxy($this->getDB());
+
             self::$_started = true;
         }
     }
@@ -110,19 +119,18 @@ class Application implements BeanInstance
      * @param array $arr
      * @return array
      */
-    protected function arrPackage(?array $arr): array
+    protected function arrPackage(array $arr): array
     {
-        if (!is_array($arr)) return [];
-        if (count($arr) === 0) return [];
+        if (count($arr) == 0) return [];
         if ((new Arrays($arr))->getKeys()
-            ->contains("@attributes", true)
+            ->contains("@attributes")
         ) return [$arr];
         return $arr;
     }
 
     /**
-     * Return an array of Filter. (Filter[])
-     * @return array
+     * Return an array of Filter.
+     * @return Filter[]
      */
     protected function getFilters(): array
     {
@@ -171,10 +179,7 @@ class Application implements BeanInstance
      */
     public static function getRequest(): Request
     {
-        if (is_null(self::$_request) || !isset(self::$_request)) {
-            self::$_request = new Request();
-        }
-        return self::$_request;
+        return self::$_request ?? self::$_request = new Request();
     }
 
     /**
@@ -209,10 +214,41 @@ class Application implements BeanInstance
      */
     public static function getResponse(): Response
     {
-        if (is_null(self::$_response) || !isset(self::$_response)) {
-            self::$_response = new Response();
+        return self::$_response ?? self::$_response = new Response();
+    }
+
+    /**
+     * 初始化SQL日志代理
+     * @param DB|null $db
+     */
+    protected function initSqlLogProxy(?DB $db): void
+    {
+        if (!is_null($db) && !is_null($db->getDBO()) && !(new Strings($db->getLogFile()))->trim()->isEmpty()) {
+            $sql = self::$sysConfig->get("sql");
+            $attrs = Utils::getDefault($sql, "@attributes");
+            $proxy = BeanUtil::newInstance($attrs["log-class"]);
+            $db->initProxyDBO($proxy instanceof SqlLogProxy ? $proxy : NULL);
         }
-        return self::$_response;
+    }
+
+    /**
+     * @return DB
+     */
+    public function getDB(): ?DB
+    {
+        if (!is_null(self::$_db)) return self::$_db;
+        $sql = self::$sysConfig->get("sql");
+        $attrs = Utils::getDefault($sql, "@attributes");
+        $db = BeanUtil::populate($sql, $attrs["class"]);
+        return self::$_db = $db instanceof DB ? $db->setLogFile($attrs["log-file"]) : NULL;
+    }
+
+    /**
+     * @param string $configPath
+     */
+    public static function setConfigPath(string $configPath): void
+    {
+        self::$configPath = $configPath;
     }
 
     /**
@@ -220,7 +256,7 @@ class Application implements BeanInstance
      */
     public static function getInstance(): self
     {
-        if (is_null(self::$_instance) || !isset(self::$_instance)) {
+        if (!isset(self::$_instance)) {
             $instance = new self();
             if (is_subclass_of($instance->appClass, self::class)) {
                 $instance = call_user_func(array($instance->appClass, "newInstance"));
@@ -236,21 +272,7 @@ class Application implements BeanInstance
      */
     public static function newInstance(...$_): self
     {
-        if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            self::$_instance = new static();
-        }
-        return self::$_instance;
-    }
-
-    /**
-     * @return DB
-     */
-    public function getDB(): ?DB
-    {
-        $sql = self::$sysConfig->get("sql");
-        $attrs = Utils::getDefault($sql, "@attributes");
-        $db = BeanUtil::populate($sql, $attrs["class"]);
-        return $db instanceof DB ? $db : NULL;
+        return self::$_instance ?? self::$_instance = new static();
     }
 
     /**

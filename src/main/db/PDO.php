@@ -11,10 +11,9 @@ namespace lanlj\fw\db;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_pdo;
-use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
 
-class PDO implements DB, BeanMapping
+class PDO extends DB
 {
     /**
      * @var string
@@ -32,7 +31,7 @@ class PDO implements DB, BeanMapping
     protected string $password;
 
     /**
-     * @var array
+     * @var array|null
      */
     protected ?array $options;
 
@@ -46,7 +45,7 @@ class PDO implements DB, BeanMapping
      * @param string $dsn
      * @param string $user
      * @param string $password
-     * @param array $options
+     * @param array|null $options
      * @param bool $isFile
      */
     public function __construct(string $dsn, string $user, string $password, array $options = null, bool $isFile = false)
@@ -56,39 +55,35 @@ class PDO implements DB, BeanMapping
         $this->password = $password;
         $this->options = $options;
         $this->isFile = $isFile;
+        try {
+            $this->dbo = new ez_pdo(new Config('pdo', [
+                $this->dsn, $this->user, $this->password, $this->options, $this->isFile
+            ]));
+        } catch (Exception $e) {
+        }
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
+        if ($args instanceof self)
+            return $args;
+        $args = new Arrays($args);
 
-        $options = $values->get('options');
+        $options = $args->get('options');
         if (!is_array($options)) {
-            $eval = $values->get('eval', false);
+            $eval = $args->get('eval', false);
             $eval ? $options = eval("return $options;") : $options = null;
         }
         return new self(
-            $values->get('dsn', ''),
-            $values->get('user', ''),
-            $values->get('password', ''),
+            $args->get('dsn', ''),
+            $args->get('user', ''),
+            $args->get('password', ''),
             $options,
-            $values->get('isFile', false)
+            $args->get('isFile', false)
         );
-    }
-
-    /**
-     * Get PDO database object
-     * @return ez_pdo
-     * @throws Exception
-     */
-    public function getDBO(): ez_pdo
-    {
-        return new ez_pdo(new Config('pdo', [$this->dsn, $this->user, $this->password, $this->options, $this->isFile]));
     }
 }

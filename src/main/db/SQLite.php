@@ -11,10 +11,9 @@ namespace lanlj\fw\db;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_sqlite3;
-use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
 
-class SQLite implements DB, BeanMapping
+class SQLite extends DB
 {
     /**
      * Database file path
@@ -37,31 +36,24 @@ class SQLite implements DB, BeanMapping
     {
         $this->path = $path;
         $this->name = $name;
+        try {
+            $this->dbo = new ez_sqlite3(new Config('sqlite3', [$this->path, $this->name]));
+        } catch (Exception $e) {
+        }
     }
 
     /**
-     * @param array|object $values
+     * @param array|object $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
-
-        $path = $values->get('path', '');
-        $eval = $values->get('eval', false);
+        if ($args instanceof self)
+            return $args;
+        $args = new Arrays($args);
+        $path = $args->get('path', '');
+        $eval = $args->get('eval', false);
         if ($eval) $path = eval("return $path;");
-        return new self($path, $values->get('name', ''));
-    }
-
-    /**
-     * Get SQLite3 database object
-     * @return ez_sqlite3
-     * @throws Exception
-     */
-    public function getDBO(): ez_sqlite3
-    {
-        return new ez_sqlite3(new Config('sqlite3', [$this->path, $this->name]));
+        return new self($path, $args->get('name', ''));
     }
 }

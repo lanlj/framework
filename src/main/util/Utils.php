@@ -32,11 +32,11 @@ class Utils
 
     /**
      * @param array|object $var
-     * @param string|int $key
+     * @param string $key
      * @param mixed $default
      * @return mixed
      */
-    public static function getDefault($var, $key, $default = null)
+    public static function getDefault($var, string $key, $default = null)
     {
         if (is_object($var)) $var = ArrayUtil::toArray($var, false, true);
         $v = array_key_exists($key, $var) ? $var[$key] : $default;
@@ -72,7 +72,7 @@ class Utils
      * @param string $type
      * @return bool
      */
-    public static function setType(&$var, ?string $type): bool
+    public static function setType(&$var, string $type): bool
     {
         switch ($type) {
             case "bool":
@@ -98,7 +98,7 @@ class Utils
      * @param mixed $var Variable
      * @return string Type of variable
      */
-    public static function getType($var): ?string
+    public static function getType($var): string
     {
         if (is_bool($var)) return self::TYPE_BOOL;
         if (is_int($var)) return self::TYPE_INT;

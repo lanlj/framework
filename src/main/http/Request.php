@@ -51,7 +51,7 @@ final class Request
      * @param string $name
      * @return mixed
      */
-    public function getAttribute(?string $name)
+    public function getAttribute(string $name)
     {
         return $this->attributes->get($name);
     }
@@ -60,7 +60,7 @@ final class Request
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute(?string $name, $value)
+    public function setAttribute(string $name, $value)
     {
         $this->attributes->add($value, $name);
     }
@@ -71,7 +71,7 @@ final class Request
      * @param mixed $default
      * @return mixed
      */
-    public function getParam(?string $name, $default = null)
+    public function getParam(string $name, $default = null)
     {
         $params = $this->getParamList();
         $r = $params->get($name, $default);
@@ -118,19 +118,19 @@ final class Request
      * @param mixed $default
      * @return array
      */
-    public function getParams(?string $name, $default = null): array
+    public function getParams(string $name, $default = null): array
     {
         $params = $this->getParamList();
         $r = $params->get($name, $default);
-        return is_array($r) ? $r : [is_string($r) ? trim($r) : $r];
+        return is_array($r) ? $r : [$r];
     }
 
     /**
      * 获取指定Cookie
      * @param string $name
-     * @return mixed
+     * @return string
      */
-    public function getCookie(?string $name)
+    public function getCookie(string $name): string
     {
         return $this->getCookies()->get($name);
     }
@@ -149,16 +149,15 @@ final class Request
      */
     public function removeCookies(): void
     {
-        foreach ($_COOKIE as $key => $value)
-            $this->removeCookie($key);
+        foreach ($_COOKIE as $key => $value) $this->removeCookie($key);
     }
 
     /**
      * 移除指定Cookie
      * @param string $name
-     * @param Cookie $cookie
+     * @param Cookie|null $cookie
      */
-    public function removeCookie(?string $name, Cookie $cookie = null)
+    public function removeCookie(string $name, Cookie $cookie = null)
     {
         $uc = false;
         if (!is_null($cookie)) {
@@ -177,7 +176,7 @@ final class Request
      * @param string $s
      * @return mixed
      */
-    public function getHeader(?string $s)
+    public function getHeader(string $s)
     {
         return $this->parseHeader()->get($s);
     }
@@ -287,17 +286,19 @@ final class Request
      */
     public function getSession(): Session
     {
-        return Session::newInstance();
+        return Session::getInstance();
     }
 
     /**
      * 指定请求方式
-     * @param mixed ...$methods
+     * @param bool $output
+     * @param string ...$methods
+     * @return string|null
      */
-    public function requestMethods(...$methods)
+    public function requestMethods(bool $output = true, string ...$methods): ?string
     {
-        if (!in_array($method = $this->getMethod(), $methods))
-            die("Request method '$method' not supported.");
+        $alert = "Request method '" . ($method = $this->getMethod()) . "' not supported.";
+        return !in_array($method, $methods) ? $output ? die($alert) : $alert : NULL;
     }
 
     /**

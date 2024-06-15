@@ -9,25 +9,24 @@
 namespace lanlj\fw\model;
 
 use lanlj\fw\core\Arrays;
-use lanlj\fw\util\BooleanUtil;
 
 final class AjaxJson
 {
     /**
      * 错误代码
-     * @var int
+     * @var int|null
      */
     private ?int $code = null;
 
     /**
      * 是否成功
-     * @var bool
+     * @var bool|null
      */
     private ?bool $success = null;
 
     /**
      * 提示信息
-     * @var string
+     * @var string|null
      */
     private ?string $msg = null;
 
@@ -62,7 +61,7 @@ final class AjaxJson
     /**
      * @param int $code
      */
-    public function setCode(?int $code): void
+    public function setCode(int $code): void
     {
         $this->code = $code;
     }
@@ -72,8 +71,6 @@ final class AjaxJson
      */
     public function isSuccess(): ?bool
     {
-        if (!is_null($this->success))
-            $this->success = BooleanUtil::toBool($this->success);
         return $this->success;
     }
 
@@ -96,7 +93,7 @@ final class AjaxJson
     /**
      * @param string $msg
      */
-    public function setMsg(?string $msg)
+    public function setMsg(string $msg)
     {
         $this->msg = $msg;
     }
@@ -129,7 +126,7 @@ final class AjaxJson
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute(?string $name, $value)
+    public function setAttribute(string $name, $value)
     {
         $this->attributes->add($value, $name);
     }

@@ -15,13 +15,13 @@ class Account implements BeanMapping
 {
     /**
      * ID
-     * @var string
+     * @var string|null
      */
     protected ?string $id;
 
     /**
      * Account constructor.
-     * @param string $id
+     * @param string|null $id
      */
     public function __construct(string $id = null)
     {
@@ -29,15 +29,14 @@ class Account implements BeanMapping
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
-        return new self($values->get('id'));
+        if ($args instanceof self) return $args;
+        $args = new Arrays($args);
+        return new self($args->get('id'));
     }
 
     /**

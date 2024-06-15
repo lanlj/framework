@@ -23,7 +23,7 @@ final class Curl implements BeanMapping
 
     /**
      * 请求网址
-     * @var string
+     * @var string|null
      */
     private ?string $url = null;
 
@@ -95,14 +95,12 @@ final class Curl implements BeanMapping
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return $this
      */
-    public static function mapping($values): ?self
+    public static function mapping($args): ?self
     {
-        if ($values instanceof self)
-            return $values;
-        return null;
+        return $args instanceof self ? $args : null;
     }
 
     /**
@@ -122,7 +120,7 @@ final class Curl implements BeanMapping
      * @param mixed $value
      * @return $this
      */
-    public function setHeader(?string $key, $value): self
+    public function setHeader(string $key, $value): self
     {
         $this->headers->add($value, $key);
         return $this;
@@ -247,7 +245,7 @@ final class Curl implements BeanMapping
      * @param string $userAgent
      * @return self
      */
-    public function setUserAgent(?string $userAgent): self
+    public function setUserAgent(string $userAgent): self
     {
         return $this->setOpt(CURLOPT_USERAGENT, $userAgent);
     }
@@ -257,7 +255,7 @@ final class Curl implements BeanMapping
      * @param string $referer
      * @return self
      */
-    public function setReferer(?string $referer): self
+    public function setReferer(string $referer): self
     {
         return $this->setOpt(CURLOPT_REFERER, $referer);
     }
@@ -320,7 +318,7 @@ final class Curl implements BeanMapping
      * @param string $url
      * @return $this
      */
-    public function setUrl(?string $url): self
+    public function setUrl(string $url): self
     {
         $this->url = $url;
         return $this->setOpt(CURLOPT_URL, $url);

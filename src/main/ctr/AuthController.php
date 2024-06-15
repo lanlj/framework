@@ -8,13 +8,15 @@
 
 namespace lanlj\fw\ctr;
 
+use lanlj\fw\app\Application;
 use lanlj\fw\auth\Authorization;
 use lanlj\fw\auth\po\{Account, Token};
 use lanlj\fw\core\{Arrays, Strings};
 use lanlj\fw\http\storage\{Cookie, Session};
-use lanlj\fw\repo\TokenRepo;
+use lanlj\fw\repo\{Repository, TokenRepo};
 use lanlj\fw\util\{BooleanUtil, JsonUtil, Utils};
 use stdClass;
+use function ezsql\functions\{eq, orderBy, where};
 
 abstract class AuthController extends CommController
 {
@@ -53,7 +55,10 @@ abstract class AuthController extends CommController
     {
         $token = $authorization->getToken();
         $accountId = $token->getAccount()->getId();
-        $rst = $this->tokenRepo->getOneByAccountId($accountId);
+        $rst = $this->tokenRepo->select(
+            'id, token, expires', null,
+            where(eq('account_id', $accountId)), orderBy('expires', 'DESC')
+        );
         $bool = false;
         if (!is_null($rst) && $rst->expires - time() > 0) {
             $bool = true;
@@ -114,7 +119,7 @@ abstract class AuthController extends CommController
                     ->replaceFirst('/bGFubG/', '')
                     ->replaceLast('/o5OA==/', '')->getString();
                 $tk = new Arrays(JsonUtil::toJson(base64_decode($str), true));
-                $rst = $this->tokenRepo->getOneByToken($tk->get('token'));
+                $rst = $this->tokenRepo->select('*', null, where(eq('token', $tk->get('token'))));
                 if (!is_null($rst)) {
                     if ($rst->account_id == $tk->get('account') && $rst->expires - time() > 0) {
                         $authorization->setToken(Token::mapping($rst));
@@ -141,8 +146,9 @@ abstract class AuthController extends CommController
     protected function init(): void
     {
         parent::init();
-        $this->session = Session::newInstance();
+        $this->session = $this->req->getSession();
         date_default_timezone_set("Asia/Shanghai");
+        Repository::initialize(Application::getInstance()->getDB()->getDBO());
         $this->tokenRepo = new TokenRepo();
     }
 }

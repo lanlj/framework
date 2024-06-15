@@ -16,34 +16,34 @@ class Token implements BeanMapping
 {
     /**
      * ID
-     * @var string
+     * @var string|null
      */
     private ?string $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $token;
 
     /**
      * 授权对象
-     * @var Account
+     * @var Account|null
      * @column("account_id")
      */
     private ?Account $account;
 
     /**
      * 失效时间
-     * @var string
+     * @var string|null
      */
     private ?string $expires;
 
     /**
      * Token constructor.
-     * @param string $id
-     * @param string $token
-     * @param Account $account
-     * @param string $expires
+     * @param string|null $id
+     * @param string|null $token
+     * @param Account|null $account
+     * @param string|null $expires
      */
     public function __construct(string $id = null, string $token = null, Account $account = null, string $expires = null)
     {
@@ -54,19 +54,18 @@ class Token implements BeanMapping
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
+        if ($args instanceof self) return $args;
+        $args = new Arrays($args);
         return new self(
-            $values->get('id'),
-            $values->get('token'),
-            Account::mapping(['id' => $values->get('account_id')]),
-            $values->get('expires')
+            $args->get('id'),
+            $args->get('token'),
+            Account::mapping(['id' => $args->get('account_id')]),
+            $args->get('expires')
         );
     }
 
@@ -131,7 +130,7 @@ class Token implements BeanMapping
     /**
      * @param string $expires
      */
-    public function setExpires(string $expires)
+    public function setExpires(string $expires): void
     {
         $this->expires = $expires;
     }

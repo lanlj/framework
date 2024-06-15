@@ -8,15 +8,14 @@
 
 namespace lanlj\fw\http\storage;
 
-use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\core\Arrays;
 
-final class Session implements BeanInstance
+final class Session
 {
     /**
      * @var self
      */
-    private static ?self $_instance = null;
+    private static self $_instance;
 
     /**
      * Session constructor.
@@ -29,22 +28,18 @@ final class Session implements BeanInstance
     }
 
     /**
-     * @param mixed ...$_
      * @return self
      */
-    public static function newInstance(...$_): self
+    public static function getInstance(): self
     {
-        if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
+        return self::$_instance ?? self::$_instance = new self();
     }
 
     /**
      * @param string $name
      * @return mixed
      */
-    public function getAttribute(?string $name)
+    public function getAttribute(string $name)
     {
         return (new Arrays($_SESSION))->get($name);
     }
@@ -53,7 +48,7 @@ final class Session implements BeanInstance
      * @param string $name
      * @param mixed $value
      */
-    public function setAttribute(?string $name, $value): void
+    public function setAttribute(string $name, $value): void
     {
         $_SESSION = (new Arrays($_SESSION))->add($value, $name)->getArray();
     }
@@ -69,7 +64,7 @@ final class Session implements BeanInstance
     /**
      * @param string $name
      */
-    public function removeAttribute(?string $name)
+    public function removeAttribute(string $name)
     {
         unset($_SESSION[$name]);
     }

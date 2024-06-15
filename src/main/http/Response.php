@@ -10,7 +10,7 @@ namespace lanlj\fw\http;
 
 use lanlj\fw\core\Arrays;
 use lanlj\fw\http\storage\Cookie;
-use lanlj\fw\util\{JsonUtil, StringUtil, Utils};
+use lanlj\fw\util\{ArrayUtil, JsonUtil, Utils};
 
 final class Response
 {
@@ -23,9 +23,9 @@ final class Response
 
     /**
      * @param string $name
-     * @return mixed
+     * @return string
      */
-    public function getHeader(?string $name)
+    public function getHeader(string $name): string
     {
         return $this->parseHeader()->get($name);
     }
@@ -37,11 +37,9 @@ final class Response
     {
         $headers = new Arrays();
         foreach (headers_list() as $header) {
-            if (Utils::isEmpty($header))
-                continue;
+            if (Utils::isEmpty($header)) continue;
             $item = explode(': ', $header, 2);
-            if (count($item) == 2)
-                $headers->add(trim($item[1]), $item[0]);
+            if (count($item) == 2) $headers->add(trim($item[1]), $item[0]);
             else $headers->add(trim($header));
         }
         return $headers;
@@ -68,7 +66,7 @@ final class Response
      * @param string $contentType
      * @return self
      */
-    public function setContentType(?string $contentType): self
+    public function setContentType(string $contentType): self
     {
         return $this->setHeader('Content-Type', $contentType);
     }
@@ -85,10 +83,19 @@ final class Response
     }
 
     /**
+     * @param mixed $value
+     */
+    public function writeXml($value)
+    {
+        $this->setContentType('text/xml, application/xml; charset=utf-8');
+        echo ArrayUtil::toXML(is_array($value) ? $value : ArrayUtil::toArray($value));
+    }
+
+    /**
      * @param string $name
      * @return $this
      */
-    public function removeHeader(?string $name): self
+    public function removeHeader(string $name): self
     {
         header_remove($name);
         return $this;
@@ -108,7 +115,7 @@ final class Response
      */
     public function write($value)
     {
-        echo StringUtil::toString($value);
+        echo $value;
     }
 
     /**
@@ -138,8 +145,7 @@ final class Response
      */
     public function setHeaders(array $headers): self
     {
-        foreach ($headers as $name => $value)
-            $this->setHeader($name, $value);
+        foreach ($headers as $name => $value) $this->setHeader($name, $value);
         return $this;
     }
 

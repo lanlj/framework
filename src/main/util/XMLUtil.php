@@ -14,12 +14,13 @@ class XMLUtil
 {
     /**
      * 将xml内容转换为数组
-     * @param string $xml xml文本
+     * @param string|null $xml xml文本
      * @return array
      */
-    public static function toArray(?string $xml): ?array
+    public static function toArray(?string $xml): array
     {
-        return json_decode(self::parseXML($xml), true);
+        if (is_null($xml)) return [];
+        return is_array($arr = json_decode(self::parseXML($xml), true)) ? $arr : [];
     }
 
     /**
@@ -27,7 +28,7 @@ class XMLUtil
      * @param string $xml xml文本
      * @return string
      */
-    private static function parseXML(?string $xml): ?string
+    private static function parseXML(string $xml): string
     {
         //考虑到xml文档中可能会包含<![CDATA[]]>标签，第三个参数设置为LIBXML_NOCDATA
         libxml_disable_entity_loader(true);
@@ -37,11 +38,12 @@ class XMLUtil
 
     /**
      * 将xml内容转换为对象
-     * @param string $xml xml文本
-     * @return stdClass
+     * @param string|null $xml xml文本
+     * @return stdClass|null
      */
     public static function toObject(?string $xml): ?object
     {
-        return json_decode(self::parseXML($xml));
+        if (is_null($xml)) return NULL;
+        return is_object($obj = json_decode(self::parseXML($xml))) ? $obj : NULL;
     }
 }

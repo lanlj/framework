@@ -9,20 +9,19 @@
 namespace lanlj\fw\route;
 
 use lanlj\fw\app\Application;
-use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\core\Arrays;
 use lanlj\fw\ctr\Controller;
 use lanlj\fw\http\Request;
 use lanlj\fw\route\exception\HttpError;
 use lanlj\fw\util\ArrayUtil;
 
-class Route implements BeanInstance
+class Route
 {
     /**
      * 对象实例
      * @var self
      */
-    private static ?self $_instance = null;
+    private static self $_instance;
 
     /**
      * 路由表
@@ -94,15 +93,11 @@ class Route implements BeanInstance
 
     /**
      * 获取路由实例
-     * @param mixed ...$_
      * @return self
      */
-    public static final function newInstance(...$_): self
+    public static final function getInstance(): self
     {
-        if (is_null(self::$_instance) || !isset(self::$_instance)) {
-            self::$_instance = new static();
-        }
-        return self::$_instance;
+        return self::$_instance ?? self::$_instance = new static();
     }
 
     /**
@@ -122,7 +117,7 @@ class Route implements BeanInstance
      * @param string $baseDir
      * @return $this
      */
-    public function setBaseDir(?string $baseDir): self
+    public function setBaseDir(string $baseDir): self
     {
         $this->route->add($baseDir, 'baseDir');
         return $this;
@@ -142,7 +137,7 @@ class Route implements BeanInstance
      * @param string $namespace
      * @return $this
      */
-    public function setNamespace(?string $namespace): self
+    public function setNamespace(string $namespace): self
     {
         $this->route->add($namespace, 'namespace');
         return $this;
@@ -222,7 +217,7 @@ class Route implements BeanInstance
         }
 
         $ctr = call_user_func(array($namespace, 'getInstance'));
-        $status = 0;
+        $status = 500;
         if ($ctr instanceof Controller) {
             $status = $ctr->service();
         }
@@ -306,15 +301,13 @@ class Route implements BeanInstance
     {
         $httpErrs = new Arrays($this->route->get('httpErrs', []));
         $httpErr = $httpErrs->get($err_code);
-        if (!is_null($httpErr))
-            return HttpError::mapping($httpErr);
-        return null;
+        return !is_null($httpErr) ? HttpError::mapping($httpErr) : NULL;
     }
 
     /**
      * 是否需要eval转换
-     * @param string $require
-     * @return string
+     * @param string|null $require
+     * @return string|null
      */
     protected function ifEval(?string $require): ?string
     {

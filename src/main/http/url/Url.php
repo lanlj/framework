@@ -12,17 +12,14 @@ use lanlj\fw\core\{Arrays, Strings};
 
 final class Url
 {
-    const SCHEME = 0;
-    const HOST = 1;
-    const PORT = 2;
-    const PATH = 3;
-    const QUERY = 4;
-    private const OPTIONS = ['scheme', 'host', 'port', 'path', 'query'];
-
-    /**
-     * @var Arrays
-     */
-    private static ?Arrays $options = null;
+    const SCHEME = 'scheme';
+    const HOST = 'host';
+    const PORT = 'port';
+    const USER = 'user';
+    const PASS = 'pass';
+    const QUERY = 'query';
+    const PATH = 'path';
+    const FRAGMENT = 'fragment';
 
     /**
      * @var Arrays
@@ -31,16 +28,11 @@ final class Url
 
     /**
      * Url constructor.
-     * @param null $url
+     * @param string $url
      */
-    public function __construct($url = null)
+    public function __construct(string $url)
     {
-        $arr = array();
-        if (!is_null($url))
-            $arr = parse_url((new Strings($url))->trim()->replace('\\', '/'));
-        $this->attributes = new Arrays($arr);
-        if (is_null(self::$options))
-            self::$options = new Arrays(self::OPTIONS);
+        $this->attributes = new Arrays(parse_url((new Strings($url))->trim()->replace('\\', '/')));
     }
 
     /**
@@ -67,21 +59,21 @@ final class Url
     }
 
     /**
-     * @param int $name
+     * @param string $name
      * @param mixed $default
      * @return mixed
      */
-    public function get(int $name, $default = null)
+    public function get(string $name, $default = null)
     {
-        return $this->attributes->get(self::$options->get($name), $default);
+        return $this->attributes->get($name, $default);
     }
 
     /**
-     * @param string|int $name
+     * @param string $name
      * @param mixed $default
      * @return mixed
      */
-    public function getParam($name, $default = null)
+    public function getParam(string $name, $default = null)
     {
         return $this->getParamList()->get($name, $default);
     }
@@ -101,19 +93,19 @@ final class Url
      * @param mixed $value
      * @return self
      */
-    public function addParam(?string $name, $value): self
+    public function addParam(string $name, $value): self
     {
         return $this->set(self::QUERY, $this->getParamList()->add($value, $name)->toQueryString('&', 'p'));
     }
 
     /**
-     * @param int $name
+     * @param string $name
      * @param mixed $value
      * @return $this
      */
-    public function set(int $name, $value): self
+    public function set(string $name, $value): self
     {
-        $this->attributes->add($value, self::$options->get($name));
+        $this->attributes->add($value, $name);
         return $this;
     }
 
@@ -130,7 +122,7 @@ final class Url
      * @param string $name
      * @return Url
      */
-    public function removeParam(?string $name): self
+    public function removeParam(string $name): self
     {
         return $this->set(self::QUERY, $this->getParamList()->remove($name)->toQueryString('&', 'p'));
     }
@@ -148,7 +140,7 @@ final class Url
      * @param string $anotherPath
      * @return self
      */
-    public function replacePath(?string $anotherPath): self
+    public function replacePath(string $anotherPath): self
     {
         $pathInfo = new self($anotherPath);
         if (!is_null($pathInfo->get(self::SCHEME))) {

@@ -5,7 +5,7 @@
         <prop-files>
             <prop-file type="json" path="./src/resources/attr.json"/>
         </prop-files>
-        <sql class="\lanlj\fw\db\SQLite">
+        <sql class="\lanlj\fw\db\SQLite" log-file="./src/resources/logs/sql.log" log-class="\lanlj\fw\proxy\SqlLogProxy">
             <path>./src/resources/</path>
             <name>tests.db</name>
         </sql>

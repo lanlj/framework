@@ -14,14 +14,14 @@ use lanlj\fw\core\Arrays;
 class Mapper implements BeanMapping
 {
     /**
-     * @var string
+     * @var string|null
      */
-    private static string $reqPath;
+    private static ?string $reqPath = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private static string $defaultNS;
+    private static ?string $defaultNS = null;
 
     /**
      * @var string|array
@@ -29,12 +29,12 @@ class Mapper implements BeanMapping
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $filePath;
 
@@ -49,7 +49,7 @@ class Mapper implements BeanMapping
     private $requires;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $namespace;
 
@@ -59,20 +59,20 @@ class Mapper implements BeanMapping
     private $initParams;
 
     /**
-     * @var string
+     * @var string|null
      */
     private ?string $scope;
 
     /**
      * Mapper constructor.
      * @param array|string $path
-     * @param string $name
-     * @param string $filePath
+     * @param string|null $name
+     * @param string|null $filePath
      * @param array|string $params
      * @param array|string $requires
-     * @param string $namespace
+     * @param string|null $namespace
      * @param array|string $initParams
-     * @param string $scope
+     * @param string|null $scope
      */
     public function __construct(
         $path = null, string $name = null, string $filePath = null, $params = null,
@@ -90,23 +90,22 @@ class Mapper implements BeanMapping
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return $this
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
+        if ($args instanceof self) return $args;
+        $args = new Arrays($args);
         return new self(
-            $values->get('path'),
-            $values->get('name'),
-            $values->get('filePath'),
-            $values->get('params'),
-            $values->get('requires'),
-            $values->get('namespace'),
-            $values->get('initParams'),
-            $values->get('scope')
+            $args->get('path'),
+            $args->get('name'),
+            $args->get('filePath'),
+            $args->get('params'),
+            $args->get('requires'),
+            $args->get('namespace'),
+            $args->get('initParams'),
+            $args->get('scope')
         );
     }
 
@@ -156,7 +155,7 @@ class Mapper implements BeanMapping
      * @param string $name
      * @return $this
      */
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -174,7 +173,7 @@ class Mapper implements BeanMapping
      * @param string $filePath
      * @return $this
      */
-    public function setFilePath(?string $filePath): self
+    public function setFilePath(string $filePath): self
     {
         $this->filePath = $filePath;
         return $this;
@@ -225,8 +224,7 @@ class Mapper implements BeanMapping
     public function getNamespace(): string
     {
         if (is_string($this->namespace)) return $this->namespace;
-        $name = is_string($this->name) ? $this->name : self::$reqPath;
-        return sprintf(self::$defaultNS, $name);
+        return sprintf(self::$defaultNS, is_string($this->name) ? $this->name : self::$reqPath);
     }
 
     /**
@@ -271,7 +269,7 @@ class Mapper implements BeanMapping
      * @param string $scope
      * @return $this
      */
-    public function setScope(?string $scope): self
+    public function setScope(string $scope): self
     {
         $this->scope = $scope;
         return $this;

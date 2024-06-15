@@ -12,10 +12,9 @@ namespace lanlj\fw\db;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_mysqli;
-use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
 
-class MySQLi implements DB, BeanMapping
+class MySQLi extends DB
 {
     /**
      * @var string
@@ -33,17 +32,17 @@ class MySQLi implements DB, BeanMapping
     protected string $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected ?string $host;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected ?string $port;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected ?string $charset;
 
@@ -52,11 +51,13 @@ class MySQLi implements DB, BeanMapping
      * @param string $user
      * @param string $password
      * @param string $name
-     * @param string $host
-     * @param string $port
-     * @param string $charset
+     * @param string|null $host
+     * @param string|null $port
+     * @param string|null $charset
      */
-    public function __construct(string $user, string $password, string $name, string $host = null, string $port = null, string $charset = null)
+    public function __construct(
+        string $user, string $password, string $name, string $host = null, string $port = null, string $charset = null
+    )
     {
         $this->user = $user;
         $this->password = $password;
@@ -64,36 +65,30 @@ class MySQLi implements DB, BeanMapping
         $this->host = $host;
         $this->port = $port;
         $this->charset = $charset;
+        try {
+            $this->dbo = new ez_mysqli(new Config('mysqli', [
+                $this->user, $this->password, $this->name, $this->host, $this->port, $this->charset
+            ]));
+        } catch (Exception $e) {
+        }
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self)
-            return $values;
-        $values = new Arrays($values);
+        if ($args instanceof self)
+            return $args;
+        $args = new Arrays($args);
         return new self(
-            $values->get('user', ''),
-            $values->get('password', ''),
-            $values->get('name', ''),
-            $values->get('host'),
-            $values->get('port'),
-            $values->get('charset')
+            $args->get('user', ''),
+            $args->get('password', ''),
+            $args->get('name', ''),
+            $args->get('host'),
+            $args->get('port'),
+            $args->get('charset')
         );
-    }
-
-    /**
-     * Get MySQLi database object
-     * @return ez_mysqli
-     * @throws Exception
-     */
-    public function getDBO(): ez_mysqli
-    {
-        return new ez_mysqli(new Config('mysqli', [
-            $this->user, $this->password, $this->name, $this->host, $this->port, $this->charset
-        ]));
     }
 }

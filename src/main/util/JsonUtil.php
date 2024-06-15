@@ -14,7 +14,7 @@ class JsonUtil
     /**
      * json数据格式化
      * @param mixed $data 数据
-     * @param string $indent 缩进字符，默认4个空格
+     * @param string|null $indent 缩进字符，默认4个空格
      * @return string
      */
     public static function jsonFormat($data, string $indent = null): string
@@ -38,7 +38,7 @@ class JsonUtil
         $ret = '';
         $pos = 0;
         $length = strlen($data);
-        $indent = isset($indent) ? $indent : '    ';
+        $indent = $indent ?? '    ';
         $newline = "\n";
         $prevchar = '';
         $outofquotes = true;
@@ -100,7 +100,7 @@ class JsonUtil
 
     /**
      * 是否是合格的json数据
-     * @param string $string
+     * @param string|null $string
      * @return bool
      */
     public static function isJson(?string $string): bool
@@ -117,7 +117,7 @@ class JsonUtil
      * @param bool $quotesKey
      * @return string
      */
-    protected static function formatErrorJson(?string $data, bool $quotesKey = false): string
+    protected static function formatErrorJson(string $data, bool $quotesKey = false): string
     {
         $json = str_replace('\'', '"', $data); //替换单引号为双引号
         $json = str_replace(array('\\"'), array('<|YH|>'), $json); //替换
@@ -143,7 +143,7 @@ class JsonUtil
 
     /**
      * 将json字符串转换
-     * @param string $jsonString
+     * @param string|null $jsonString
      * @param bool $assoc
      * @return object|array|null
      */
@@ -156,7 +156,7 @@ class JsonUtil
 
     /**
      * 将数组元素进行urlencode
-     * @param string $val
+     * @param string|null $val
      */
     protected static function jsonFormatProtect(?string &$val)
     {

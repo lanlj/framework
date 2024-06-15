@@ -16,19 +16,19 @@ final class UniCurl
      * cURL配置
      * @var Curl
      */
-    private ?Curl $curl;
+    private Curl $curl;
 
     /**
      * cURL句柄信息
      * @var array
      */
-    private ?array $cURLInfo = null;
+    private array $cURLInfo = [];
 
     /**
      * UniCurl constructor.
      * @param Curl $curl
      */
-    public function __construct(Curl $curl = null)
+    public function __construct(Curl $curl)
     {
         $this->curl = $curl;
     }

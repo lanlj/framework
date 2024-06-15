@@ -16,13 +16,13 @@ class Authorization implements BeanMapping
 {
     /**
      * 授权令牌
-     * @var Token
+     * @var Token|null
      */
     private ?Token $token;
 
     /**
      * Authorization constructor.
-     * @param Token $token
+     * @param Token|null $token
      */
     public function __construct(Token $token = null)
     {
@@ -30,14 +30,14 @@ class Authorization implements BeanMapping
     }
 
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self) return $values;
-        $values = new Arrays($values);
-        return new self($values->get('token'));
+        if ($args instanceof self) return $args;
+        $args = new Arrays($args);
+        return new self($args->get('token'));
     }
 
     /**

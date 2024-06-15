@@ -3,58 +3,37 @@
  * Created by PhpStorm.
  * User: LanLiJun
  * Mail: jun@lanlj.com
- * Date: 2024/6/9
- * Time: 14:23
+ * Date: 2024/6/12
+ * Time: 19:18
  */
 
-namespace lanlj\fw\repo;
+namespace lanlj\fw\dao;
 
 use ezsql\ezsqlModel;
-use lanlj\fw\dao\DAO;
+use lanlj\fw\util\DBUtil;
+use function ezsql\functions\limit;
 
-abstract class Repository
+class DAO
 {
+    /**
+     * @var string
+     */
+    protected string $table;
+
     /**
      * @var ezsqlModel
      */
-    protected static $dbo;
+    protected $dbo;
 
     /**
-     * @var DAO
-     */
-    private DAO $dao;
-
-    /**
-     * Repository constructor.
-     */
-    public function __construct()
-    {
-        $this->initDAO();
-    }
-
-    /**
-     * 初始化Dao对象
-     * 实现此方法后调用 @method setDAO(string $table)
-     * 构造器会继承调用此方法 @method initDAO()
-     */
-    public abstract function initDAO(): void;
-
-    /**
+     * DAO constructor.
+     * @param string $table
      * @param ezsqlModel $dbo
      */
-    public static function initialize($dbo)
+    public function __construct(string $table, $dbo)
     {
-        self::$dbo = $dbo;
-        self::$dbo->prepareOn();
-        self::$dbo->hide_errors();
-    }
-
-    /**
-     * @param string $table 表名
-     */
-    public function setDAO(string $table): void
-    {
-        $this->dao = new DAO($table, self::$dbo);
+        $this->table = $table;
+        $this->dbo = $dbo;
     }
 
     /**
@@ -64,7 +43,7 @@ abstract class Repository
      */
     public function insert($data): bool
     {
-        return $this->dao->insert($data);
+        return $this->dbo->insert($this->table, DBUtil::toDBArray($data));
     }
 
     /**
@@ -75,7 +54,7 @@ abstract class Repository
      */
     public function update($data, ...$whereConditions): bool
     {
-        return $this->dao->update($data, ...$whereConditions);
+        return $this->dbo->update($this->table, DBUtil::toDBArray($data), ...$whereConditions);
     }
 
     /**
@@ -85,7 +64,7 @@ abstract class Repository
      */
     public function delete(...$whereConditions): bool
     {
-        return $this->dao->delete(...$whereConditions);
+        return $this->dbo->delete($this->table, ...$whereConditions);
     }
 
     /**
@@ -97,7 +76,8 @@ abstract class Repository
      */
     public function select(string $columnFields = '*', string $class = null, ...$conditions): ?object
     {
-        return $this->dao->select($columnFields, $class, ...$conditions);
+        $conditions[] = limit(1);
+        return $this->selectALL($columnFields, $class, ...$conditions)[0];
     }
 
     /**
@@ -109,7 +89,8 @@ abstract class Repository
      */
     public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): ?array
     {
-        return $this->dao->selectALL($columnFields, $class, ...$conditions);
+        $results = $this->dbo->select($this->table, $columnFields, ...$conditions);
+        return DBUtil::toClassObject($results, $class, true);
     }
 
     /**
@@ -120,7 +101,7 @@ abstract class Repository
      */
     public function query(string $sql, ...$parameters): bool
     {
-        return $this->dao->query($sql, ...$parameters);
+        return $this->dbo->query(DBUtil::buildSQL($sql, $parameters));
     }
 
     /**
@@ -132,7 +113,7 @@ abstract class Repository
      */
     public function getOne(string $sql, string $class = null, ...$parameters): ?object
     {
-        return $this->dao->getOne($sql, $class, ...$parameters);
+        return DBUtil::toClassObject($this->dbo->get_row(DBUtil::buildSQL($sql, ...$parameters)), $class);
     }
 
     /**
@@ -144,6 +125,6 @@ abstract class Repository
      */
     public function getList(string $sql, string $class = null, ...$parameters): ?array
     {
-        return $this->dao->getList($sql, $class, $parameters);
+        return DBUtil::toClassObject($this->dbo->get_results(DBUtil::buildSQL($sql, ...$parameters)), $class, true);
     }
 }

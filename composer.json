@@ -9,6 +9,11 @@
             "email": "jun@lanlj.com",
             "homepage": "https://lanlj.com",
             "role": "Developer"
+        },
+        {
+            "name": "dongnan",
+            "email": "hidongnan@gmail.com",
+            "homepage": "https://github.com/dongnan/microAOP/"
         }
     ],
     "require": {
@@ -24,7 +29,8 @@
     },
     "autoload": {
         "psr-4": {
-            "lanlj\\fw\\": "src/main/"
+            "lanlj\\fw\\": "src/main/",
+            "microAOP\\": "src/lib/microAOP/"
         },
         "classmap": [
             "src/3rd/"

@@ -12,8 +12,8 @@ namespace lanlj\fw\bean;
 interface BeanMapping
 {
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return self
      */
-    public static function mapping($values): ?self;
+    public static function mapping($args): ?self;
 }

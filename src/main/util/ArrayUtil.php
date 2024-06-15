@@ -30,9 +30,9 @@ class ArrayUtil
 
     /**
      * @param array $arr
-     * @param DOMDocument $dom
-     * @param DOMElement $node
-     * @param array $config
+     * @param DOMDocument|null $dom
+     * @param DOMElement|null $node
+     * @param array|null $config
      * @return string
      */
     public static function toXML(array $arr, DOMDocument $dom = null, DOMElement $node = null, array $config = null): string

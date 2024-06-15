@@ -27,19 +27,19 @@ final class MultiCurl
      * 所有cURL标签
      * @var array
      */
-    private ?array $labels = null;
+    private array $labels = [];
 
     /**
      * 所有cURL配置
      * @var array
      */
-    private ?array $curls = null;
+    private array $curls = [];
 
     /**
      * 所有cURL句柄信息
      * @var array
      */
-    private ?array $cURLInfo = null;
+    private array $cURLInfo = [];
 
     /**
      * MultiCurl constructor.
@@ -88,7 +88,7 @@ final class MultiCurl
      * @param string $method
      * @return $this
      */
-    public function setCurl(?string $label, Curl $curl, ?string $method = self::GET): self
+    public function setCurl(string $label, Curl $curl, string $method = self::GET): self
     {
         switch ($method) {
             case self::POST:

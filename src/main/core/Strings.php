@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\core;
 
-final class Strings
+class Strings
 {
     const GBK = "GBK";
     const BIG5 = "BIG5";
@@ -22,7 +22,7 @@ final class Strings
 
     /**
      * Strings constructor.
-     * @param string $string
+     * @param string|null $string
      */
     public function __construct(?string $string = '')
     {
@@ -51,7 +51,7 @@ final class Strings
      * @param bool $i
      * @return bool
      */
-    public function startsWith(?string $needle, bool $i = true): bool
+    public function startsWith(string $needle, bool $i = true): bool
     {
         if (!$i) return strpos($this->string, $needle) === 0;
         return stripos($this->string, $needle) === 0;
@@ -63,7 +63,7 @@ final class Strings
      * @param bool $i
      * @return bool
      */
-    public function endsWith(?string $needle, bool $i = true): bool
+    public function endsWith(string $needle, bool $i = true): bool
     {
         if (!$i) return ($pos = strrpos($this->string, $needle)) !== false && $pos == strlen($this->string) - strlen($needle);
         return ($pos = strripos($this->string, $needle)) !== false && $pos == strlen($this->string) - strlen($needle);
@@ -75,7 +75,7 @@ final class Strings
      * @param bool $i
      * @return bool
      */
-    public function contains(?string $needle, bool $i = true): bool
+    public function contains(string $needle, bool $i = true): bool
     {
         if (!$i) return stripos($this->string, $needle) !== false;
         return strpos($this->string, $needle) !== false;
@@ -86,7 +86,7 @@ final class Strings
      * @param string $string
      * @return $this
      */
-    public function concat(?string $string): self
+    public function concat(string $string): self
     {
         $this->string .= $string;
         return $this;
@@ -113,12 +113,12 @@ final class Strings
     /**
      * 字符串替换
      * @param array|string $search
-     * @param array|string $replacement
+     * @param array|string $replace
      * @return self
      */
-    public function replace($search, $replacement): self
+    public function replace($search, $replace): self
     {
-        return new self(str_replace($search, $replacement, $this->string));
+        return new self(str_replace($search, $replace, $this->string));
     }
 
     /**
@@ -150,11 +150,11 @@ final class Strings
     /**
      * 是否正则匹配
      * @param string $pattern
-     * @param array $matches
+     * @param $matches
      * @param bool $matchAll
-     * @return int
+     * @return bool
      */
-    public function matches(string $pattern, array &$matches = null, bool $matchAll = false): int
+    public function matches(string $pattern, &$matches, bool $matchAll = false): bool
     {
         if (!$matchAll) return preg_match($pattern, $this->string, $matches);
         return preg_match_all($pattern, $this->string, $matches);
@@ -166,7 +166,7 @@ final class Strings
      * @param int $offset
      * @return int
      */
-    public function lastIndexOf(?string $needle, int $offset = null): int
+    public function lastIndexOf(string $needle, int $offset = 0): int
     {
         return mb_strrpos($this->string, $needle, $offset, $this->getEncoding());
     }
@@ -192,7 +192,7 @@ final class Strings
     /**
      * 转换字符串编码
      * @param string $to_encoding
-     * @param string $from_encoding
+     * @param string|null $from_encoding
      * @param bool $ignore
      * @return $this
      */
@@ -242,18 +242,17 @@ final class Strings
      * @param int $limit
      * @return array
      */
-    public function split(string $pattern, bool $regex = false, int $limit = null): array
+    public function split(string $pattern, bool $regex = false, int $limit = -1): array
     {
         if (!$regex)
-            if (is_null($limit)) return explode($pattern, $this->string);
-            else return explode($pattern, $this->string, $limit);
-        return preg_split($pattern, $this->string, $limit ?: -1);
+            return $limit == -1 ? explode($pattern, $this->string) : explode($pattern, $this->string, $limit);
+        return preg_split($pattern, $this->string, $limit);
     }
 
     /**
      * 字符串截取
      * @param int $start
-     * @param int $length
+     * @param int|null $length
      * @return self
      */
     public function substring(int $start, int $length = null): self
@@ -274,7 +273,7 @@ final class Strings
 
     /**
      * 字符串是否相等（区分大小写）
-     * @param string $anotherString
+     * @param string|null $anotherString
      * @return bool
      */
     public function equals(?string $anotherString): bool
@@ -284,7 +283,7 @@ final class Strings
 
     /**
      * 字符串是否相等（不区分大小写）
-     * @param string $anotherString
+     * @param string|null $anotherString
      * @return bool
      */
     public function equalsIgnoreCase(?string $anotherString): bool

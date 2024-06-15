@@ -15,13 +15,12 @@ use lanlj\fw\http\{Request, Response};
 final class CORSFilter implements Filter, BeanMapping
 {
     /**
-     * @param object|array $values
+     * @param object|array $args
      * @return $this
      */
-    public static function mapping($values): self
+    public static function mapping($args): self
     {
-        if ($values instanceof self) return $values;
-        return new self();
+        return $args instanceof self ? $args : new self();
     }
 
     /**

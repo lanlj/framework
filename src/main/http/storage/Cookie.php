@@ -15,7 +15,7 @@ final class Cookie
     /**
      * @var string
      */
-    private ?string $name;
+    private string $name;
 
     /**
      * @var string
@@ -52,7 +52,7 @@ final class Cookie
      * @param string $name
      * @param mixed $value
      */
-    public function __construct(?string $name, $value)
+    public function __construct(string $name, $value)
     {
         $this->name = $name;
         $this->setValue($value);
@@ -61,7 +61,7 @@ final class Cookie
     /**
      * @return string
      */
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

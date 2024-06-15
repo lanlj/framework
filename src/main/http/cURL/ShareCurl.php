@@ -27,25 +27,25 @@ final class ShareCurl
      * 所有cURL标签
      * @var array
      */
-    private ?array $labels = null;
+    private array $labels = [];
 
     /**
      * 所有cURL配置
      * @var array
      */
-    private ?array $curls = null;
+    private array $curls = [];
 
     /**
      * 所有cURL句柄
      * @var array
      */
-    private ?array $chs = null;
+    private array $chs = [];
 
     /**
      * 所有cURL句柄信息
      * @var array
      */
-    private ?array $cURLInfo = null;
+    private array $cURLInfo = [];
 
     /**
      * ShareCurl constructor.
@@ -106,7 +106,7 @@ final class ShareCurl
      * @param string $method
      * @return $this
      */
-    public function setCurl(?string $label, Curl $curl, ?string $method = self::GET): self
+    public function setCurl(string $label, Curl $curl, string $method = self::GET): self
     {
         $curl->setOpt(CURLOPT_SHARE, $this->sh);
         switch ($method) {

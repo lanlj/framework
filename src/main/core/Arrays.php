@@ -12,7 +12,7 @@ use lanlj\fw\util\{ArrayUtil, JsonUtil, Utils};
 use ReflectionException;
 use ReflectionFunction;
 
-final class Arrays
+class Arrays
 {
     /**
      * @var array
@@ -25,8 +25,7 @@ final class Arrays
      */
     public function __construct($array = array())
     {
-        if (!is_array($array)) $array = ArrayUtil::toArray($array);
-        $this->array = $array;
+        $this->array = is_array($array) ? $array : ArrayUtil::toArray($array);
     }
 
     /**
@@ -71,15 +70,12 @@ final class Arrays
 
     /**
      * @param mixed $value
-     * @param int|string $key
+     * @param string|null $key
      * @return $this
      */
-    public function add($value, $key = null): self
+    public function add($value, string $key = null): self
     {
-        if ($key && (is_numeric($key) || is_string($key)))
-            $this->array[$key] = $value;
-        else
-            $this->array[] = $value;
+        is_null($key) ? $this->array[] = $value : $this->array[$key] = $value;
         return $this;
     }
 
@@ -106,10 +102,10 @@ final class Arrays
     }
 
     /**
-     * @param int|string $index
+     * @param string $index
      * @return $this
      */
-    public function remove($index): self
+    public function remove(string $index): self
     {
         unset($this->array[$index]);
         return $this;
@@ -146,11 +142,11 @@ final class Arrays
     }
 
     /**
-     * @param int|string $key
+     * @param string $key
      * @param mixed $default
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         $v = array_key_exists($key, $this->array) ? $this->array[$key] : $default;
         return Utils::getVal($v, $default);
@@ -193,7 +189,7 @@ final class Arrays
      * @param string $numeric_prefix 参数名为数字时的前缀
      * @return string
      */
-    public function toQueryString(string $arg_separator = '&', string $numeric_prefix = null): string
+    public function toQueryString(string $arg_separator = '&', string $numeric_prefix = ""): string
     {
         return urldecode(http_build_query($this->array, $numeric_prefix, $arg_separator));
     }
