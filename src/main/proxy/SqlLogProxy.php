@@ -14,8 +14,7 @@ use Exception;
 use lanlj\fw\app\Application;
 use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\core\Strings;
-use lanlj\fw\util\FileUtil;
-use lanlj\fw\util\JsonUtil;
+use lanlj\fw\util\{FileUtil, JsonUtil};
 
 class SqlLogProxy implements BeanInstance
 {
@@ -36,11 +35,23 @@ class SqlLogProxy implements BeanInstance
         extract($params);
         $log = new Strings((new DateTime())->format('Y-m-d H:i:s.u') . ' ----- ');
         $log->concat("$class->$method(" . (count($args) == 0 ? NULL : JsonUtil::toJsonString($args)) . ")");
-        $log->concat(": " . JsonUtil::toJsonString($return));
+        $log->concat(": " . self::dealReturned($return));
         $exception instanceof Exception && $log->concat(', Throw exception: [' . $exception->getMessage() . ']');
         is_null($err = $instance->getLastError()) || $log->concat(", Error: [$err]");
         is_null($sql = $instance->getLastQuery()) || $log->concat(", SQL: [$sql]");
         self::saveLog($log->concat("\r\n"));
+    }
+
+    /**
+     * @param mixed $return
+     * @return string
+     */
+    private static function dealReturned($return): string
+    {
+        if (is_null($return)) return 'null';
+        if (is_object($return)) return 'object';
+        if (is_array($return)) return sprintf('array(%u)', count($return));
+        return JsonUtil::toJsonString($return);
     }
 
     /**
