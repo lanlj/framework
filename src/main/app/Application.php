@@ -36,7 +36,7 @@ class Application implements BeanInstance
     /**
      * @var DB|null
      */
-    private static ?DB $_db = null;
+    private static ?DB $_db;
 
     /**
      * @var bool
@@ -236,7 +236,7 @@ class Application implements BeanInstance
      */
     public function getDB(): ?DB
     {
-        if (!is_null(self::$_db)) return self::$_db;
+        if (isset(self::$_db)) return self::$_db;
         $sql = self::$sysConfig->get("sql");
         $attrs = Utils::getDefault($sql, "@attributes");
         $db = BeanUtil::populate($sql, $attrs["class"]);

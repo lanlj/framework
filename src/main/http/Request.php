@@ -130,7 +130,7 @@ final class Request
      * @param string $name
      * @return string
      */
-    public function getCookie(string $name): string
+    public function getCookie(string $name): ?string
     {
         return $this->getCookies()->get($name);
     }

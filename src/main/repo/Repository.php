@@ -144,6 +144,31 @@ abstract class Repository
      */
     public function getList(string $sql, string $class = null, ...$parameters): ?array
     {
-        return $this->dao->getList($sql, $class, $parameters);
+        return $this->dao->getList($sql, $class, ...$parameters);
+    }
+
+    /**
+     * 通过SQL查询单列
+     * @param string $sql
+     * @param int $col 列索引，0=第1列
+     * @param mixed ...$parameters
+     * @return array
+     */
+    public function getCol(string $sql, int $col = 0, ...$parameters): array
+    {
+        return $this->dao->getCol($sql, $col, ...$parameters);
+    }
+
+    /**
+     * 通过SQL查询单值
+     * @param string $sql
+     * @param int $col 列索引，0=第1列
+     * @param int $row 行索引，0=第1行
+     * @param mixed ...$parameters
+     * @return mixed|null
+     */
+    public function getVar(string $sql, int $col = 0, int $row = 0, ...$parameters)
+    {
+        return $this->dao->getVar($sql, $col, $row, ...$parameters);
     }
 }

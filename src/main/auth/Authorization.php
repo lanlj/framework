@@ -58,9 +58,11 @@ class Authorization implements BeanMapping
 
     /**
      * @param Token $token
+     * @return Authorization
      */
-    public function setToken(Token $token)
+    public function setToken(Token $token): Authorization
     {
         $this->token = $token;
+        return $this;
     }
 }

@@ -13,6 +13,7 @@ use DOMElement;
 use Exception;
 use lanlj\fw\core\Arrays;
 use ReflectionObject;
+use stdClass;
 
 class ArrayUtil
 {
@@ -71,31 +72,35 @@ class ArrayUtil
         $arr = array();
         if ($all && is_array($var)) {
             foreach ($var as $k => $v) {
-                $arr[$k] = is_array($v) || is_object($v) ? self::toArray($v, $onlyPublic, $all) : $v;
+                $arr[$k] = is_array($v) || is_object($v) ? self::toArray($v, $onlyPublic, $all, $db) : $v;
             }
             return $arr;
         }
         if (is_array($var)) return $var;
-        if (!is_object($var)) {
-            return [$var];
-        }
+        if (!is_object($var)) return [$var];
+        if ($var instanceof stdClass) return self::toArray(get_object_vars($var), $onlyPublic, $all, $db);
         $ref = new ReflectionObject($var);
         foreach ($ref->getProperties() as $property) {
             $name = $property->getName();
             $value = null;
             if (!$onlyPublic || $property->isPublic()) {
-                $mn = ucwords(str_replace('_', '', $name));
-                $other_ways = true;
-                if (method_exists($var, $method_name = "get$mn") || method_exists($var, $method_name = "is$mn")) {
+                $otherWays = true;
+                $_name = str_replace('_', '', $name);
+                $mn1 = ucwords($_name);
+                $mn2 = strtoupper($_name);
+                if (
+                    $ref->hasMethod($mn = "get$mn1") || $ref->hasMethod($mn = "is$mn1") ||
+                    $ref->hasMethod($mn = "get$mn2") || $ref->hasMethod($mn = "is$mn2")
+                ) {
                     try {
-                        $method = $ref->getMethod($method_name);
+                        $method = $ref->getMethod($mn);
                         $method->setAccessible(true);
                         $value = $method->invoke($var);
-                        $other_ways = false;
+                        $otherWays = false;
                     } catch (Exception $e) {
                     }
                 }
-                if ($other_ways) {
+                if ($otherWays) {
                     if (method_exists($var, '__get'))
                         $value = $var->$name;
                     else {
@@ -104,7 +109,7 @@ class ArrayUtil
                     }
                 }
             }
-            if ($all && (is_array($value) || is_object($value))) $value = self::toArray($value, $onlyPublic, $all);
+            if ($all && (is_array($value) || is_object($value))) $value = self::toArray($value, $onlyPublic, $all, $db);
             if (!self::$objectIgnoreNULL || !is_null($value)) $arr[!$db ? $name : BeanUtil::getColumnName($property, $db)] = $value;
         }
         return $arr;

@@ -49,9 +49,11 @@ class Account implements BeanMapping
 
     /**
      * @param string $id
+     * @return Account
      */
-    public function setId(string $id)
+    public function setId(string $id): Account
     {
         $this->id = $id;
+        return $this;
     }
 }

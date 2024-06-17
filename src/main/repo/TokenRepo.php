@@ -9,9 +9,6 @@
 
 namespace lanlj\fw\repo;
 
-use lanlj\fw\auth\po\Token;
-use lanlj\fw\util\ArrayUtil;
-
 class TokenRepo extends Repository
 {
     /**
@@ -33,17 +30,5 @@ class TokenRepo extends Repository
     public function initDAO(): void
     {
         parent::setDAO(self::$table);
-    }
-
-    /**
-     * 新增条目
-     * @param Token $token
-     * @return bool
-     */
-    public function insert($token): bool
-    {
-        $data = ArrayUtil::toArray($token, false, true, true);
-        $data['account_id'] = $data['account_id']['id'];
-        return parent::insert($data);
     }
 }

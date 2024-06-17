@@ -18,16 +18,16 @@ use ReflectionProperty;
 class BeanUtil
 {
     /**
-     * @param array $valuesList
+     * @param array $values
      * @param mixed $class
      * @param bool $db
      * @return array
      */
-    public static function populates(array $valuesList, $class, bool $db = false): array
+    public static function populates(array $values, $class, bool $db = false): array
     {
         $objs = [];
-        foreach ($valuesList as $values) {
-            $obj = self::populate($values, $class, $db);
+        foreach ($values as $value) {
+            $obj = self::populate($value, $class, $db);
             if (!is_null($obj)) $objs[] = $obj;
         }
         return $objs;
@@ -35,33 +35,36 @@ class BeanUtil
 
     /**
      * NULL is returned if the specified class is not exist.
-     * @param object|array $values
+     * @param object|array $value
      * @param mixed $class
      * @param bool $db
      * @return object|null
      */
-    public static function populate($values, $class, bool $db = false): ?object
+    public static function populate($value, $class, bool $db = false): ?object
     {
+        if (!is_object($value) && !is_array($value)) return NULL;
+        $values = new Arrays($value);
+        if ($values->isEmpty()) return NULL;
         if (is_subclass_of($class, BeanMapping::class))
-            return call_user_func(array($class, 'mapping'), $values);
+            return call_user_func(array($class, 'mapping'), $value);
         $obj = self::newInstance($class);
-        if (is_null($obj)) return null;
+        if (is_null($obj)) return NULL;
         $ref = new ReflectionObject($obj);
-        $values = new Arrays($values);
         foreach ($ref->getProperties() as $property) {
             $name = $property->getName();
             $value = $values->get(self::getColumnName($property, $db));
-            $other_ways = true;
-            if ($ref->hasMethod($mn = 'set' . ucwords(str_replace('_', '', $name)))) {
+            $otherWays = true;
+            $_name = str_replace('_', '', $name);
+            if ($ref->hasMethod($mn = 'set' . ucwords($_name)) || $ref->hasMethod($mn = 'set' . strtoupper($_name))) {
                 try {
                     $method = $ref->getMethod($mn);
                     $method->setAccessible(true);
                     $method->invoke($obj, $value);
-                    $other_ways = false;
+                    $otherWays = false;
                 } catch (Exception $e) {
                 }
             }
-            if ($other_ways) {
+            if ($otherWays) {
                 if ($ref->hasMethod('__set'))
                     $obj->$name = $value;
                 else {

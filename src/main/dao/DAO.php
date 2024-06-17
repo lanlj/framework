@@ -90,6 +90,7 @@ class DAO
     public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): ?array
     {
         $results = $this->dbo->select($this->table, $columnFields, ...$conditions);
+        if (!is_array($results)) return null;
         return DBUtil::toClassObject($results, $class, true);
     }
 
@@ -101,7 +102,7 @@ class DAO
      */
     public function query(string $sql, ...$parameters): bool
     {
-        return $this->dbo->query(DBUtil::buildSQL($sql, $parameters));
+        return $this->dbo->query(DBUtil::preparedSQL($sql, ...$parameters));
     }
 
     /**
@@ -113,7 +114,7 @@ class DAO
      */
     public function getOne(string $sql, string $class = null, ...$parameters): ?object
     {
-        return DBUtil::toClassObject($this->dbo->get_row(DBUtil::buildSQL($sql, ...$parameters)), $class);
+        return DBUtil::toClassObject($this->dbo->get_row(DBUtil::preparedSQL($sql, ...$parameters)), $class);
     }
 
     /**
@@ -125,6 +126,33 @@ class DAO
      */
     public function getList(string $sql, string $class = null, ...$parameters): ?array
     {
-        return DBUtil::toClassObject($this->dbo->get_results(DBUtil::buildSQL($sql, ...$parameters)), $class, true);
+        $results = $this->dbo->get_results(DBUtil::preparedSQL($sql, ...$parameters));
+        if (!is_array($results)) return null;
+        return DBUtil::toClassObject($results, $class, true);
+    }
+
+    /**
+     * 通过SQL查询单列
+     * @param string $sql
+     * @param int $col 列索引，0=第1列
+     * @param mixed ...$parameters
+     * @return array
+     */
+    public function getCol(string $sql, int $col = 0, ...$parameters): array
+    {
+        return $this->dbo->get_col(DBUtil::preparedSQL($sql, ...$parameters), $col);
+    }
+
+    /**
+     * 通过SQL查询单值
+     * @param string $sql
+     * @param int $col 列索引，0=第1列
+     * @param int $row 行索引，0=第1行
+     * @param mixed ...$parameters
+     * @return mixed|null
+     */
+    public function getVar(string $sql, int $col = 0, int $row = 0, ...$parameters)
+    {
+        return $this->dbo->get_var(DBUtil::preparedSQL($sql, ...$parameters), $col, $row);
     }
 }

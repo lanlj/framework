@@ -10,6 +10,7 @@ namespace lanlj\fw\auth\po;
 
 use lanlj\fw\bean\BeanMapping;
 use lanlj\fw\core\Arrays;
+use lanlj\fw\util\ArrayUtil;
 use lanlj\fw\util\Utils;
 
 class Token implements BeanMapping
@@ -79,10 +80,12 @@ class Token implements BeanMapping
 
     /**
      * @param string $id
+     * @return Token
      */
-    public function setId(string $id)
+    public function setId(string $id): Token
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -96,10 +99,12 @@ class Token implements BeanMapping
 
     /**
      * @param string $token
+     * @return Token
      */
-    public function setToken(string $token): void
+    public function setToken(string $token): Token
     {
         $this->token = $token;
+        return $this;
     }
 
     /**
@@ -112,10 +117,12 @@ class Token implements BeanMapping
 
     /**
      * @param Account $account
+     * @return Token
      */
-    public function setAccount(Account $account)
+    public function setAccount(Account $account): Token
     {
         $this->account = $account;
+        return $this;
     }
 
     /**
@@ -129,9 +136,21 @@ class Token implements BeanMapping
 
     /**
      * @param string $expires
+     * @return Token
      */
-    public function setExpires(string $expires): void
+    public function setExpires(string $expires): Token
     {
         $this->expires = $expires;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        $data = ArrayUtil::toArray($this, false, true, true);
+        $data['account_id'] = $data['account_id']['id'];
+        return $data;
     }
 }

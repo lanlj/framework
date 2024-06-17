@@ -10,7 +10,7 @@ namespace lanlj\fw\util;
 
 use lanlj\fw\core\Strings;
 
-final class DBUtil
+class DBUtil
 {
     /**
      * 数据处理
@@ -32,26 +32,35 @@ final class DBUtil
     public static function toClassObject($data, string $class = null, bool $multi = false)
     {
         if (!is_string($class)) return $data;
-        if (!is_object($data) && !is_array($data)) return NULL;
-        $objs = array();
-        foreach ($multi ? $data : [$data] as $item) {
-            $objs[] = BeanUtil::populate($item, $class, true);
-        }
+        $objs = BeanUtil::populates($multi ? $data : [$data], $class, true);
         return $multi ? $objs : $objs[0];
     }
 
     /**
-     * 替换SQL语句占位符为实参
+     * 预处理SQL语句
      * @param string $sql
      * @param mixed $parameters
      * @return string
      */
-    public static function buildSQL(string $sql, ...$parameters): string
+    public static function preparedSQL(string $sql, ...$parameters): string
     {
         if (($size = count($parameters)) > 0) {
             if ($size == 1) $parameters = ArrayUtil::toArray($parameters[0], false, true);
-            return preg_replace_callback(['/{([A-Za-z0-9_.]+)}/', '/:([A-Za-z0-9_.]+)/'], function ($matches) use ($parameters) {
-                return ArrayUtil::getNestedValue($parameters, (new Strings($matches[1]))->split('.')) ?? $matches[0];
+            preg_match_all('/\?[^=\d+]|\?$/', $sql, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+            $count = 0;
+            foreach ($matches as $k => $v) {
+                $sql = substr_replace($sql, "?$k", $v[0][1] + ($count++), 1);
+            }
+            return preg_replace_callback([
+                '/(\?)=?((\w+)\.[\w.]+)/', '/(\?)=?(\w+)/',
+                '/(#)((\w+)\.[\w.]+)/', '/(#)(\w+)/', '/(#){((\w+)\.[\w.]+)}/', '/(#){(\w+)}/'
+            ], function ($matches) use ($parameters) {
+                if (!isset($matches[3])) $value = $parameters[$matches[2]];
+                else $value = ArrayUtil::getNestedValue($parameters, (new Strings($matches[2]))->split('.'));
+                if ($matches[1] == '#') return $value;
+                if (is_null($value)) return 'NULL';
+                if (is_string($value)) return "'$value'";
+                return $value;
             }, $sql);
         }
         return $sql;

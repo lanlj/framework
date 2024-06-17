@@ -77,7 +77,9 @@ abstract class AuthController extends CommController
             $cookie->setPath($this->cookiePath);
             $this->resp->addCookie($cookie);
             if (!$bool) {
-                return $this->tokenRepo->insert(new Token(null, $class->token, new Account($class->account), $token->getExpires()));
+                return $this->tokenRepo->insert(
+                    (new Token(null, $class->token, new Account($class->account), $token->getExpires()))->toArray()
+                );
             }
         }
         return true;
