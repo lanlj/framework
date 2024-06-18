@@ -27,7 +27,7 @@ abstract class Repository
     /**
      * @var string|null
      */
-    private ?string $class;
+    private ?string $class = null;
 
     /**
      * Repository constructor.
@@ -39,8 +39,8 @@ abstract class Repository
 
     /**
      * 初始化Dao对象
-     * 实现此方法后调用 @method setDAO(string $table)
-     * 构造器会继承调用此方法 @method initDAO()
+     * 实现此方法后调用 @method void setDAO(string $table);
+     * 构造器会继承调用此方法 @method void initDAO();
      */
     protected abstract function initDAO(): void;
 
@@ -57,9 +57,9 @@ abstract class Repository
     /**
      * 插入条目
      * @param object|array $data
-     * @return bool
+     * @return int
      */
-    public function insert($data): bool
+    public function insert($data): int
     {
         return $this->dao->insert($data);
     }

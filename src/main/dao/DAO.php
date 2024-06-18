@@ -39,9 +39,9 @@ class DAO
     /**
      * 插入条目
      * @param object|array $data
-     * @return bool
+     * @return int
      */
-    public function insert($data): bool
+    public function insert($data): int
     {
         return $this->dbo->insert($this->table, DBUtil::toDBArray($data));
     }
