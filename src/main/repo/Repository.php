@@ -25,6 +25,11 @@ abstract class Repository
     private DAO $dao;
 
     /**
+     * @var string|null
+     */
+    private ?string $class;
+
+    /**
      * Repository constructor.
      */
     public function __construct()
@@ -55,6 +60,24 @@ abstract class Repository
     public function setDAO(string $table): void
     {
         $this->dao = new DAO($table, self::$dbo);
+    }
+
+    /**
+     * @return string|null 实体类class
+     */
+    public function getClass(): ?string
+    {
+        return $this->class;
+    }
+
+    /**
+     * @param string|null $class 实体类class
+     * @return Repository
+     */
+    public function setClass(string $class = null): Repository
+    {
+        $this->class = $class;
+        return $this;
     }
 
     /**
@@ -91,25 +114,23 @@ abstract class Repository
     /**
      * 查询单个条目
      * @param string $columnFields
-     * @param string|null $class
      * @param mixed ...$conditions
      * @return object|null
      */
-    public function select(string $columnFields = '*', string $class = null, ...$conditions): ?object
+    public function select(string $columnFields = '*', ...$conditions): ?object
     {
-        return $this->dao->select($columnFields, $class, ...$conditions);
+        return $this->dao->select($columnFields, $this->class, ...$conditions);
     }
 
     /**
      * 查询所有条目
      * @param string $columnFields
-     * @param string|null $class
      * @param mixed ...$conditions
      * @return array|null
      */
-    public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): ?array
+    public function selectALL(string $columnFields = '*', ...$conditions): ?array
     {
-        return $this->dao->selectALL($columnFields, $class, ...$conditions);
+        return $this->dao->selectALL($columnFields, $this->class, ...$conditions);
     }
 
     /**
@@ -126,25 +147,23 @@ abstract class Repository
     /**
      * 通过SQL查询单个
      * @param string $sql
-     * @param string|null $class
      * @param mixed ...$parameters
      * @return object|null
      */
-    public function getOne(string $sql, string $class = null, ...$parameters): ?object
+    public function getOne(string $sql, ...$parameters): ?object
     {
-        return $this->dao->getOne($sql, $class, ...$parameters);
+        return $this->dao->getOne($sql, $this->class, ...$parameters);
     }
 
     /**
      * 通过SQL查询集合
      * @param string $sql
-     * @param string|null $class
      * @param mixed ...$parameters
      * @return array|null
      */
-    public function getList(string $sql, string $class = null, ...$parameters): ?array
+    public function getList(string $sql, ...$parameters): ?array
     {
-        return $this->dao->getList($sql, $class, ...$parameters);
+        return $this->dao->getList($sql, $this->class, ...$parameters);
     }
 
     /**
