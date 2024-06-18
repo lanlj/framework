@@ -12,13 +12,14 @@ class Utils
 {
     const TYPE_BOOL = "boolean";
     const TYPE_INT = "integer";
-    const TYPE_FLOAT = "float";
+    const TYPE_DOUBLE = "double";
     const TYPE_STRING = "string";
     const TYPE_ARRAY = "array";
     const TYPE_OBJECT = "object";
     const TYPE_RESOURCE = "resource";
-    const TYPE_NULL = "null";
-    const TYPE_UNKNOWN = "unknown";
+    const TYPE_RESOURCE_CLOSED = "resource (closed)";
+    const TYPE_NULL = "NULL";
+    const TYPE_UNKNOWN = "unknown type";
 
     /**
      * 生成guid
@@ -81,8 +82,8 @@ class Utils
             case "int":
             case self::TYPE_INT:
                 return is_int($var = intval($var));
-            case "double":
-            case self::TYPE_FLOAT:
+            case "float":
+            case self::TYPE_DOUBLE:
                 return is_float($var = floatval($var));
             case self::TYPE_STRING:
                 return is_string($var = StringUtil::toString($var));
@@ -100,14 +101,6 @@ class Utils
      */
     public static function getType($var): string
     {
-        if (is_bool($var)) return self::TYPE_BOOL;
-        if (is_int($var)) return self::TYPE_INT;
-        if (is_float($var)) return self::TYPE_FLOAT;
-        if (is_string($var)) return self::TYPE_STRING;
-        if (is_array($var)) return self::TYPE_ARRAY;
-        if (is_object($var)) return self::TYPE_OBJECT;
-        if (is_resource($var)) return self::TYPE_RESOURCE;
-        if (is_null($var)) return self::TYPE_NULL;
-        return self::TYPE_UNKNOWN;
+        return gettype($var);
     }
 }

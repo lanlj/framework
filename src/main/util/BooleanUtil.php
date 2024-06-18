@@ -65,4 +65,24 @@ class BooleanUtil
                 return false;
         }
     }
+
+    /**
+     * Check if all vars are true
+     * @param bool ...$vars
+     * @return bool
+     */
+    public static function all(bool ...$vars): bool
+    {
+        return !in_array(false, $vars);
+    }
+
+    /**
+     * Check if any of vars is true
+     * @param bool ...$vars
+     * @return bool
+     */
+    public static function any(bool ...$vars): bool
+    {
+        return in_array(true, $vars);
+    }
 }
