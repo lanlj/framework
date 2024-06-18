@@ -174,14 +174,6 @@ abstract class Repository
     }
 
     /**
-     * @return string|null 实体类class
-     */
-    protected function getClass(): ?string
-    {
-        return $this->class;
-    }
-
-    /**
      * @param string|null $class 实体类class
      * @return Repository
      */
