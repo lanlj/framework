@@ -42,7 +42,7 @@ abstract class Repository
      * 实现此方法后调用 @method setDAO(string $table)
      * 构造器会继承调用此方法 @method initDAO()
      */
-    public abstract function initDAO(): void;
+    protected abstract function initDAO(): void;
 
     /**
      * @param ezsqlModel $dbo
@@ -52,32 +52,6 @@ abstract class Repository
         self::$dbo = $dbo;
         self::$dbo->prepareOn();
         self::$dbo->hide_errors();
-    }
-
-    /**
-     * @param string $table 表名
-     */
-    public function setDAO(string $table): void
-    {
-        $this->dao = new DAO($table, self::$dbo);
-    }
-
-    /**
-     * @return string|null 实体类class
-     */
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
-
-    /**
-     * @param string|null $class 实体类class
-     * @return Repository
-     */
-    public function setClass(string $class = null): Repository
-    {
-        $this->class = $class;
-        return $this;
     }
 
     /**
@@ -189,5 +163,31 @@ abstract class Repository
     public function getVar(string $sql, int $col = 0, int $row = 0, ...$parameters)
     {
         return $this->dao->getVar($sql, $col, $row, ...$parameters);
+    }
+
+    /**
+     * @param string $table 表名
+     */
+    protected function setDAO(string $table): void
+    {
+        $this->dao = new DAO($table, self::$dbo);
+    }
+
+    /**
+     * @return string|null 实体类class
+     */
+    protected function getClass(): ?string
+    {
+        return $this->class;
+    }
+
+    /**
+     * @param string|null $class 实体类class
+     * @return Repository
+     */
+    protected function setClass(string $class = null): Repository
+    {
+        $this->class = $class;
+        return $this;
     }
 }
