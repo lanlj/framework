@@ -56,8 +56,7 @@ abstract class AuthController extends CommController
         $token = $authorization->getToken();
         $accountId = $token->getAccount()->getId();
         $rst = $this->tokenRepo->select(
-            'id, token, expires', null,
-            where(eq('account_id', $accountId)), orderBy('expires', 'DESC')
+            'id, token, expires', where(eq('account_id', $accountId)), orderBy('expires', 'DESC')
         );
         $bool = false;
         if (!is_null($rst) && $rst->expires - time() > 0) {
@@ -121,7 +120,7 @@ abstract class AuthController extends CommController
                     ->replaceFirst('/bGFubG/', '')
                     ->replaceLast('/o5OA==/', '')->getString();
                 $tk = new Arrays(JsonUtil::toJson(base64_decode($str), true));
-                $rst = $this->tokenRepo->select('*', null, where(eq('token', $tk->get('token'))));
+                $rst = $this->tokenRepo->select('*', where(eq('token', $tk->get('token'))));
                 if (!is_null($rst)) {
                     if ($rst->account_id == $tk->get('account') && $rst->expires - time() > 0) {
                         $authorization->setToken(Token::mapping($rst));

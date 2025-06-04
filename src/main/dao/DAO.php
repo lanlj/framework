@@ -26,14 +26,49 @@ class DAO
     protected $dbo;
 
     /**
+     * @var string|null
+     */
+    private ?string $castClass;
+
+    /**
+     * @var string|null
+     */
+    private ?string $castClassBak = null;
+
+    /**
      * DAO constructor.
      * @param string $table
      * @param ezsqlModel $dbo
+     * @param string|null $castClass
      */
-    public function __construct(string $table, $dbo)
+    public function __construct(string $table, $dbo, string $castClass = null)
     {
         $this->table = $table;
         $this->dbo = $dbo;
+        $this->castClass = $castClass;
+        $this->castClassBak = $castClass;
+    }
+
+    /**
+     * 转换为指定class对象
+     * @param string|null $castClass 转换的class名称
+     * @return DAO
+     */
+    public function setCastClass(string $castClass = null): DAO
+    {
+        if (!is_null($this->castClass)) $this->castClassBak = $this->castClass;
+        $this->castClass = $castClass;
+        return $this;
+    }
+
+    /**
+     * 恢复为上一次指定转换的class名称
+     * @return DAO
+     */
+    public function restoreCastClass(): DAO
+    {
+        $this->castClass = $this->castClassBak;
+        return $this;
     }
 
     /**
@@ -70,37 +105,35 @@ class DAO
     /**
      * 查询单个条目
      * @param string $columnFields
-     * @param string|null $class
      * @param mixed ...$conditions
      * @return object|null
      */
-    public function select(string $columnFields = '*', string $class = null, ...$conditions): ?object
+    public function select(string $columnFields = '*', ...$conditions): ?object
     {
         $conditions[] = limit(1);
-        return $this->selectALL($columnFields, $class, ...$conditions)[0];
+        return $this->selectALL($columnFields, ...$conditions)[0];
     }
 
     /**
      * 查询所有条目
      * @param string $columnFields
-     * @param string|null $class
      * @param mixed ...$conditions
      * @return array|null
      */
-    public function selectALL(string $columnFields = '*', string $class = null, ...$conditions): ?array
+    public function selectALL(string $columnFields = '*', ...$conditions): ?array
     {
         $results = $this->dbo->select($this->table, $columnFields, ...$conditions);
         if (!is_array($results)) return null;
-        return DBUtil::toClassObject($results, $class, true);
+        return DBUtil::toClassObject($results, $this->castClass, true);
     }
 
     /**
      * 执行SQL
      * @param string $sql
      * @param mixed ...$parameters
-     * @return bool
+     * @return bool|mixed
      */
-    public function query(string $sql, ...$parameters): bool
+    public function query(string $sql, ...$parameters)
     {
         return $this->dbo->query(DBUtil::preparedSQL($sql, ...$parameters));
     }
@@ -108,27 +141,25 @@ class DAO
     /**
      * 通过SQL查询单个
      * @param string $sql
-     * @param string|null $class
      * @param mixed ...$parameters
      * @return object|null
      */
-    public function getOne(string $sql, string $class = null, ...$parameters): ?object
+    public function getOne(string $sql, ...$parameters): ?object
     {
-        return DBUtil::toClassObject($this->dbo->get_row(DBUtil::preparedSQL($sql, ...$parameters)), $class);
+        return DBUtil::toClassObject($this->dbo->get_row(DBUtil::preparedSQL($sql, ...$parameters)), $this->castClass);
     }
 
     /**
      * 通过SQL查询集合
      * @param string $sql
-     * @param string|null $class
      * @param mixed ...$parameters
      * @return array|null
      */
-    public function getList(string $sql, string $class = null, ...$parameters): ?array
+    public function getList(string $sql, ...$parameters): ?array
     {
         $results = $this->dbo->get_results(DBUtil::preparedSQL($sql, ...$parameters));
         if (!is_array($results)) return null;
-        return DBUtil::toClassObject($results, $class, true);
+        return DBUtil::toClassObject($results, $this->castClass, true);
     }
 
     /**
@@ -136,9 +167,9 @@ class DAO
      * @param string $sql
      * @param int $col 列索引，0=第1列
      * @param mixed ...$parameters
-     * @return array
+     * @return array|null
      */
-    public function getCol(string $sql, int $col = 0, ...$parameters): array
+    public function getCol(string $sql, int $col = 0, ...$parameters): ?array
     {
         return $this->dbo->get_col(DBUtil::preparedSQL($sql, ...$parameters), $col);
     }

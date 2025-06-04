@@ -27,7 +27,12 @@ abstract class Repository
     /**
      * @var string|null
      */
-    private ?string $class = null;
+    private ?string $castClass = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $castClassBak = null;
 
     /**
      * Repository constructor.
@@ -93,7 +98,7 @@ abstract class Repository
      */
     public function select(string $columnFields = '*', ...$conditions): ?object
     {
-        return $this->dao->select($columnFields, $this->class, ...$conditions);
+        return $this->dao->setCastClass($this->castClass)->select($columnFields, ...$conditions);
     }
 
     /**
@@ -104,16 +109,16 @@ abstract class Repository
      */
     public function selectALL(string $columnFields = '*', ...$conditions): ?array
     {
-        return $this->dao->selectALL($columnFields, $this->class, ...$conditions);
+        return $this->dao->setCastClass($this->castClass)->selectALL($columnFields, ...$conditions);
     }
 
     /**
      * 执行SQL
      * @param string $sql
      * @param mixed ...$parameters
-     * @return bool
+     * @return bool|mixed
      */
-    public function query(string $sql, ...$parameters): bool
+    public function query(string $sql, ...$parameters)
     {
         return $this->dao->query($sql, ...$parameters);
     }
@@ -126,7 +131,7 @@ abstract class Repository
      */
     public function getOne(string $sql, ...$parameters): ?object
     {
-        return $this->dao->getOne($sql, $this->class, ...$parameters);
+        return $this->dao->setCastClass($this->castClass)->getOne($sql, ...$parameters);
     }
 
     /**
@@ -137,7 +142,7 @@ abstract class Repository
      */
     public function getList(string $sql, ...$parameters): ?array
     {
-        return $this->dao->getList($sql, $this->class, ...$parameters);
+        return $this->dao->setCastClass($this->castClass)->getList($sql, ...$parameters);
     }
 
     /**
@@ -145,9 +150,9 @@ abstract class Repository
      * @param string $sql
      * @param int $col 列索引，0=第1列
      * @param mixed ...$parameters
-     * @return array
+     * @return array|null
      */
-    public function getCol(string $sql, int $col = 0, ...$parameters): array
+    public function getCol(string $sql, int $col = 0, ...$parameters): ?array
     {
         return $this->dao->getCol($sql, $col, ...$parameters);
     }
@@ -174,12 +179,24 @@ abstract class Repository
     }
 
     /**
-     * @param string|null $class 实体类class
+     * 转换为指定class对象
+     * @param string|null $castClass 转换的class名称
      * @return Repository
      */
-    protected function setClass(string $class = null): Repository
+    protected function setCastClass(string $castClass = null): Repository
     {
-        $this->class = $class;
+        if (!is_null($this->castClass)) $this->castClassBak = $this->castClass;
+        $this->castClass = $castClass;
+        return $this;
+    }
+
+    /**
+     * 恢复为上一次指定转换的class名称
+     * @return Repository
+     */
+    protected function restoreCastClass(): Repository
+    {
+        $this->castClass = $this->castClassBak;
         return $this;
     }
 }

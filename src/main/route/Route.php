@@ -24,16 +24,15 @@ class Route
     private static self $_instance;
 
     /**
+     * @var Application
+     */
+    protected Application $app;
+
+    /**
      * 路由表
      * @var Arrays
      */
     protected Arrays $route;
-
-    /**
-     * 请求Path
-     * @var string
-     */
-    protected string $reqPath;
 
     /**
      * Route constructor.
@@ -50,13 +49,12 @@ class Route
     {
         ob_start(); // 开启缓冲区
 
-        $app = Application::getInstance();
+        $this->app = Application::getInstance();
 
         $httpErrs = $this->getDefaultHttpErrs();
 
         // 检测访问路径是不是PHP_SELF
-        $this->reqPath = $app->getRequestPath();
-        if ($_SERVER['PHP_SELF'] === $this->reqPath) {
+        if ($_SERVER['PHP_SELF'] === $this->app->getRequestPath(false)) {
             $_403 = HttpError::mapping($httpErrs->get(403));
             header($_403->getErrHeader());
             die($_403->getErrMessage());
@@ -239,7 +237,7 @@ class Route
     protected function getMapper(): Mapper
     {
         $baseDir = $this->route->get('baseDir', '/');
-        $reqPath = preg_replace("~$baseDir~", '', $this->reqPath, 1);
+        $reqPath = preg_replace("~$baseDir~", '', $this->app->getRequestPath(), 1);
 
         Mapper::setReqPath($reqPath);
         Mapper::setDefaultNS($this->route->get('namespace', '%s'));

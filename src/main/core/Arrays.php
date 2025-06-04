@@ -96,7 +96,7 @@ class Arrays
      */
     public function removeAll(array $array, bool $keyArray = true): self
     {
-        if ($keyArray) $this->array = array_diff_key($this->array, $array);
+        if ($keyArray) $this->array = array_diff_key($this->array, array_flip($array));
         else $this->array = array_diff($this->array, $array);
         return $this;
     }

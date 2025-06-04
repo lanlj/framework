@@ -23,13 +23,13 @@ class DBUtil
     }
 
     /**
-     * 转为指定class对象
+     * 转换为指定class对象
      * @param object|array $data
      * @param string|null $class
      * @param bool $multi 是否为多维数组
      * @return object|array|null
      */
-    public static function toClassObject($data, string $class = null, bool $multi = false)
+    public static function toClassObject($data, ?string $class, bool $multi = false)
     {
         if (!is_string($class)) return $data;
         $objs = BeanUtil::populates($multi ? $data : [$data], $class, true);

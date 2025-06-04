@@ -73,12 +73,12 @@ final class Response
 
     /**
      * @param string $name
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
-    public function setHeader(string $name, string $value): self
+    public function setHeader(string $name, string $value = null): self
     {
-        if (!headers_sent()) header($name . ': ' . $value);
+        if (!headers_sent()) is_null($value) ? header($name) : header("$name: $value");
         return $this;
     }
 

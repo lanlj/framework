@@ -74,7 +74,8 @@ class Application implements BeanInstance
                 $config = XMLUtil::toArray(file_get_contents(self::$configPath));
             $appConfig = new Arrays($config);
             self::$sysConfig = new Arrays($appConfig->get("sys", []));
-            self::$properties = new Arrays($appConfig->get("props", []));
+            $properties = $appConfig->get("props", []);
+            !isset(self::$properties) ? self::$properties = new Arrays($properties) : self::$properties->addAll($properties);
             $this->appClass = $appConfig->get("@attributes")["class"];
 
             $filters = self::$sysConfig->get("filters", []);
@@ -153,14 +154,19 @@ class Application implements BeanInstance
     }
 
     /**
+     * @param bool $save
      * @return string
      */
-    public function getRequestPath(): string
+    public function getRequestPath(bool $save = true): string
     {
-        if (is_null($reqPath = $this->getProperty("requestPath"))) {
-            $reqPath = UrlUtil::fixPath(parse_url(self::getRequest()->getRequestURL(), PHP_URL_PATH));
-            $this->setProperty("requestPath", $reqPath);
-        }
+        if ($save && !is_null($reqPath = $this->getProperty("requestPath"))) return $reqPath;
+
+        $fixReqPath = $this->getProperty("fixRequestPath", true);
+        $reqPath = parse_url(self::getRequest()->getRequestURL(), PHP_URL_PATH);
+
+        if (!$save || $fixReqPath) $reqPath = UrlUtil::fixPath($reqPath);
+        if ($save && is_null($this->getProperty("requestPath"))) $this->setProperty("requestPath", $reqPath);
+
         return $reqPath;
     }
 
@@ -186,7 +192,7 @@ class Application implements BeanInstance
      * @param string $name
      * @param mixed $value
      */
-    public function setProperty(string $name, $value)
+    public function setProperty(string $name, $value): void
     {
         self::$properties->add($value, $name);
     }
@@ -237,10 +243,20 @@ class Application implements BeanInstance
     public function getDB(): ?DB
     {
         if (isset(self::$_db)) return self::$_db;
-        $sql = self::$sysConfig->get("sql");
+        $sql = self::$sysConfig->get("sql", []);
         $attrs = Utils::getDefault($sql, "@attributes");
         $db = BeanUtil::populate($sql, $attrs["class"]);
         return self::$_db = $db instanceof DB ? $db->setLogFile($attrs["log-file"]) : NULL;
+    }
+
+    /**
+     * 设置是否修复请求路径(剔除请求路径中多余的斜线)
+     * @param bool $fixRequestPath
+     */
+    public static function setFixRequestPath(bool $fixRequestPath = true): void
+    {
+        if (!isset(self::$properties)) self::$properties = new Arrays();
+        self::$properties->add($fixRequestPath, "fixRequestPath");
     }
 
     /**

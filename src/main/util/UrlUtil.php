@@ -20,4 +20,13 @@ class UrlUtil
     {
         return preg_replace('/[\/]{2,}/', '/', $path, $first ? 1 : -1);
     }
+
+    /**
+     * @param string|null $url
+     * @return bool
+     */
+    public static function validateUrl(?string $url): bool
+    {
+        return filter_var($url, FILTER_VALIDATE_URL);
+    }
 }
