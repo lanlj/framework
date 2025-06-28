@@ -178,14 +178,14 @@ final class Request
      */
     public function getHeader(string $s)
     {
-        return $this->parseHeader()->get($s);
+        return $this->parseHeaders()->get($s);
     }
 
     /**
      * 解析请求头部信息
      * @return Arrays
      */
-    private function parseHeader(): Arrays
+    private function parseHeaders(): Arrays
     {
         if (!function_exists('getallheaders')) {
             $headers = array();
@@ -215,7 +215,7 @@ final class Request
      */
     public function getHeaderNames(): Arrays
     {
-        return $this->parseHeader()->getKeys();
+        return $this->parseHeaders()->getKeys();
     }
 
     /**

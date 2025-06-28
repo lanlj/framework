@@ -30,7 +30,7 @@ final class ShareCurl
     private array $labels = [];
 
     /**
-     * 所有cURL配置
+     * 所有cURL对象
      * @var array
      */
     private array $curls = [];
@@ -42,27 +42,21 @@ final class ShareCurl
     private array $chs = [];
 
     /**
-     * 所有cURL句柄信息
-     * @var array
-     */
-    private array $cURLInfo = [];
-
-    /**
      * ShareCurl constructor.
      * @param resource $sh
      */
     public function __construct($sh = null)
     {
-        $this->setSh($sh);
+        $this->setShareHandle($sh);
     }
 
     /**
      * @param resource $sh
      * @return $this
      */
-    public function setSh($sh): self
+    public function setShareHandle($sh): self
     {
-        $this->closeSh();
+        $this->closeShareHandle();
         if (!is_resource($sh)) $sh = curl_share_init();
         $this->sh = $sh;
         return $this;
@@ -71,7 +65,7 @@ final class ShareCurl
     /**
      * Close resource
      */
-    private function closeSh(): void
+    private function closeShareHandle(): void
     {
         if (is_resource($this->sh)) {
             unset($this->labels);
@@ -79,14 +73,6 @@ final class ShareCurl
             unset($this->chs);
             curl_share_close($this->sh);
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getCURLInfo(): array
-    {
-        return $this->cURLInfo;
     }
 
     /**
@@ -134,35 +120,26 @@ final class ShareCurl
      */
     public function exec(): array
     {
-        $responses = array();
+        $packets = array();
         foreach ($this->chs as $ch) {
-            $r = curl_exec($ch);
-            $err_no = curl_errno($ch);
-            $err_msg = curl_error($ch);
+            $result = curl_exec($ch);
             $label = (string)$ch;
-            $arr = null;
-            if (!$err_no) {
-                $cURLInfo = curl_getinfo($ch);
+            $packet = new CurlPacket(curl_errno($ch), curl_error($ch), curl_getinfo($ch));
+            if ($packet->getErrNo() == 0) {
                 $curl = Curl::mapping($this->curls[$label]);
-                if ($curl->isGetRequestHeader())
-                    $arr['request_header'] = CurlUtil::parseHeader(curl_getinfo($ch, CURLINFO_HEADER_OUT));
-                if ($curl->isGetResponseHeader()) {
-                    $headerSize = $cURLInfo['header_size']; //获得响应结果里的：头大小
-                    $arr['response_header'] = CurlUtil::parseHeader(substr($r, 0, $headerSize)); //根据头大小去获取头内容
-                    $arr['response_body'] = substr($r, $headerSize);
-                } else $arr['response_body'] = $r;
-                $this->cURLInfo[$this->labels[$label]] = $cURLInfo;
-            } else {
-                $arr['err_no'] = $err_no;
-                $arr['err_msg'] = $err_msg;
+                if ($curl->isGetRequestHeaders())
+                    $packet->setRequestHeaders(CurlUtil::parseHeaders(curl_getinfo($ch, CURLINFO_HEADER_OUT)));
+                if ($curl->isGetResponseHeaders()) {
+                    $headerSize = $packet->getCURLInfo()['header_size']; //获得句柄信息里的头大小
+                    $packet->setResponseHeaders(CurlUtil::parseHeaders(substr($result, 0, $headerSize))); //根据头大小去获取头内容
+                    $packet->setResponseBody(substr($result, $headerSize));
+                } else $packet->setResponseBody($result);
             }
-            $responses[$this->labels[$label]] = $arr;
-
+            $packets[$this->labels[$label]] = $packet;
             curl_close($ch);
         }
-
-        $this->closeSh();
-        return $responses;
+        $this->closeShareHandle();
+        return $packets;
     }
 
     /**
@@ -170,6 +147,6 @@ final class ShareCurl
      */
     public function __destruct()
     {
-        $this->closeSh();
+        $this->closeShareHandle();
     }
 }

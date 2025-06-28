@@ -8,7 +8,6 @@
 
 namespace lanlj\fw\util;
 
-
 class JsonUtil
 {
     /**

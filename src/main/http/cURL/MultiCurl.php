@@ -30,16 +30,10 @@ final class MultiCurl
     private array $labels = [];
 
     /**
-     * 所有cURL配置
+     * 所有cURL对象
      * @var array
      */
     private array $curls = [];
-
-    /**
-     * 所有cURL句柄信息
-     * @var array
-     */
-    private array $cURLInfo = [];
 
     /**
      * MultiCurl constructor.
@@ -47,16 +41,16 @@ final class MultiCurl
      */
     public function __construct($mh = null)
     {
-        $this->setMh($mh);
+        $this->setMultiHandle($mh);
     }
 
     /**
      * @param resource $mh
      * @return $this
      */
-    public function setMh($mh): self
+    public function setMultiHandle($mh): self
     {
-        $this->closeMh();
+        $this->closeMultiHandle();
         if (!is_resource($mh)) $mh = curl_multi_init();
         $this->mh = $mh;
         return $this;
@@ -65,7 +59,7 @@ final class MultiCurl
     /**
      * Close resource
      */
-    private function closeMh(): void
+    private function closeMultiHandle(): void
     {
         if (is_resource($this->mh)) {
             unset($this->labels);
@@ -75,11 +69,14 @@ final class MultiCurl
     }
 
     /**
-     * @return array
+     * @param int $option
+     * @param mixed $value
+     * @return $this
      */
-    public function getCURLInfo(): array
+    public function setOpt(int $option, $value): self
     {
-        return $this->cURLInfo;
+        curl_multi_setopt($this->mh, $option, $value);
+        return $this;
     }
 
     /**
@@ -115,7 +112,7 @@ final class MultiCurl
      */
     public function exec(): array
     {
-        $responses = array();
+        $packets = array();
         $active = null;
         do {
             while (($mrc = curl_multi_exec($this->mh, $active)) == CURLM_CALL_MULTI_PERFORM) ;
@@ -127,25 +124,21 @@ final class MultiCurl
 
                 // get the info and content returned on the request
                 $ch = $done['handle'];
-                $err_msg = curl_error($ch);
+
+                $result = curl_multi_getcontent($ch);
                 $label = (string)$ch;
-                $arr = null;
-                if ($err_msg == '') {
-                    $cURLInfo = curl_getinfo($ch);
+                $packet = new CurlPacket(curl_errno($ch), curl_error($ch), curl_getinfo($ch));
+                if ($packet->getErrNo() == 0) {
                     $curl = Curl::mapping($this->curls[$label]);
-                    $r = curl_multi_getcontent($ch);
-                    if ($curl->isGetRequestHeader())
-                        $arr['request_header'] = CurlUtil::parseHeader(curl_getinfo($ch, CURLINFO_HEADER_OUT));
-                    if ($curl->isGetResponseHeader()) {
-                        $headerSize = $cURLInfo['header_size']; //获得响应结果里的：头大小
-                        $arr['response_header'] = CurlUtil::parseHeader(substr($r, 0, $headerSize)); //根据头大小去获取头内容
-                        $arr['response_body'] = substr($r, $headerSize);
-                    } else $arr['response_body'] = $r;
-                    $this->cURLInfo[$this->labels[$label]] = $cURLInfo;
-                } else {
-                    $arr['err_msg'] = $err_msg;
+                    if ($curl->isGetRequestHeaders())
+                        $packet->setRequestHeaders(CurlUtil::parseHeaders(curl_getinfo($ch, CURLINFO_HEADER_OUT)));
+                    if ($curl->isGetResponseHeaders()) {
+                        $headerSize = $packet->getCURLInfo()['header_size']; //获得句柄信息里的头大小
+                        $packet->setResponseHeaders(CurlUtil::parseHeaders(substr($result, 0, $headerSize))); //根据头大小去获取头内容
+                        $packet->setResponseBody(substr($result, $headerSize));
+                    } else $packet->setResponseBody($result);
                 }
-                $responses[$this->labels[$label]] = $arr;
+                $packets[$this->labels[$label]] = $packet;
 
                 // remove the curl handle that just completed
                 curl_multi_remove_handle($this->mh, $ch);
@@ -159,8 +152,8 @@ final class MultiCurl
 
         } while ($active);
 
-        $this->closeMh();
-        return $responses;
+        $this->closeMultiHandle();
+        return $packets;
     }
 
     /**
@@ -168,6 +161,6 @@ final class MultiCurl
      */
     public function __destruct()
     {
-        $this->closeMh();
+        $this->closeMultiHandle();
     }
 }

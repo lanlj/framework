@@ -60,7 +60,9 @@ class Route
             die($_403->getErrMessage());
         }
 
-        $this->route = new Arrays(); // 初始化路由
+        $this->route = new Arrays(
+            ['httpErrs' => $httpErrs->getArray()]
+        ); // 初始化路由
     }
 
     /**
@@ -105,9 +107,6 @@ class Route
     public function setRoute($route): self
     {
         $this->route->addAll(ArrayUtil::toArray($route, false, true));
-        $httpErrs = $this->getDefaultHttpErrs();
-        $httpErrs->addAll($this->route->get('httpErrs', []));
-        $this->route->add($httpErrs->getArray(), 'httpErrs');
         return $this;
     }
 
@@ -292,13 +291,13 @@ class Route
     }
 
     /**
-     * @param int $err_code
+     * @param int $errCode
      * @return HttpError
      */
-    public function getHttpErr(int $err_code): ?HttpError
+    public function getHttpErr(int $errCode): ?HttpError
     {
         $httpErrs = new Arrays($this->route->get('httpErrs', []));
-        $httpErr = $httpErrs->get($err_code);
+        $httpErr = $httpErrs->get($errCode);
         return !is_null($httpErr) ? HttpError::mapping($httpErr) : NULL;
     }
 
@@ -313,14 +312,14 @@ class Route
     }
 
     /**
-     * @param int $err_code
-     * @param HttpError $http_err
+     * @param int $errCode
+     * @param HttpError $httpErr
      * @return $this
      */
-    public function addHttpErr(int $err_code, HttpError $http_err): self
+    public function addHttpErr(int $errCode, HttpError $httpErr): self
     {
         $httpErrs = new Arrays($this->route->get('httpErrs', []));
-        $this->route->add($httpErrs->add($http_err, $err_code)->getArray(), 'httpErrs');
+        $this->route->add($httpErrs->add($httpErr, $errCode)->getArray(), 'httpErrs');
         return $this;
     }
 

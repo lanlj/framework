@@ -27,13 +27,13 @@ final class Response
      */
     public function getHeader(string $name): string
     {
-        return $this->parseHeader()->get($name);
+        return $this->parseHeaders()->get($name);
     }
 
     /**
      * @return Arrays
      */
-    private function parseHeader(): Arrays
+    private function parseHeaders(): Arrays
     {
         $headers = new Arrays();
         foreach (headers_list() as $header) {
@@ -50,7 +50,7 @@ final class Response
      */
     public function getHeaderNames(): Arrays
     {
-        return $this->parseHeader()->getKeys();
+        return $this->parseHeaders()->getKeys();
     }
 
     /**
@@ -136,7 +136,7 @@ final class Response
      */
     public function getContentType(): string
     {
-        return $this->parseHeader()->get('Content-Type');
+        return $this->parseHeaders()->get('Content-Type');
     }
 
     /**

@@ -80,7 +80,14 @@ class ArrayUtil
         if (!is_object($var)) return [$var];
         if ($var instanceof stdClass) return self::toArray(get_object_vars($var), $onlyPublic, $all, $db);
         $ref = new ReflectionObject($var);
-        foreach ($ref->getProperties() as $property) {
+        $properties = $ref->getProperties();
+        $parent = $ref->getParentClass();
+        while (true) {
+            if ($parent === false) break;
+            $properties = array_merge($parent->getProperties(), $properties);
+            $parent = $parent->getParentClass();
+        }
+        foreach ($properties as $property) {
             $name = $property->getName();
             $value = null;
             if (!$onlyPublic || $property->isPublic()) {

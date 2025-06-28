@@ -49,7 +49,7 @@ class Authorization implements BeanMapping
     }
 
     /**
-     * @return Token
+     * @return Token|null
      */
     public function getToken(): ?Token
     {
@@ -57,10 +57,10 @@ class Authorization implements BeanMapping
     }
 
     /**
-     * @param Token $token
+     * @param Token|null $token
      * @return Authorization
      */
-    public function setToken(Token $token): Authorization
+    public function setToken(?Token $token): Authorization
     {
         $this->token = $token;
         return $this;

@@ -39,20 +39,19 @@ class FileUtil
     /**
      * 判断远程文件是否存在
      * @param string $url
-     * @param bool $get_headers
+     * @param bool $useCurl
      * @return bool
      */
-    public static function remoteFileExists(string $url, bool $get_headers = false): bool
+    public static function remoteFileExists(string $url, bool $useCurl = false): bool
     {
-        if ($get_headers)
-            return get_headers($url)[0] == 'HTTP/1.1 200 OK';
-        $r = (new UniCurl(
+        if (!$useCurl) return get_headers($url)[0] == 'HTTP/1.1 200 OK';
+        $packet = (new UniCurl(
             (new Curl())->setUrl($url)
                 ->setDefaultTimeout()
                 ->setDefaultUserAgent()
-                ->setReferer('https://www.baidu.com')
-                ->setOpt(CURLOPT_FOLLOWLOCATION, true)
+                ->setAutoGenerateReferer(true)
+                ->setFollowLocation(true)
         ))->head();
-        return !isset($r['err_no']) && $r['response_header'][0] == 'HTTP/1.1 200 OK';
+        return $packet->getErrNo() == 0 && $packet->getStatusCode() == 'HTTP/1.1 200 OK';
     }
 }

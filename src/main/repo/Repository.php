@@ -25,16 +25,6 @@ abstract class Repository
     private DAO $dao;
 
     /**
-     * @var string|null
-     */
-    private ?string $castClass = null;
-
-    /**
-     * @var string|null
-     */
-    private ?string $castClassBak = null;
-
-    /**
      * Repository constructor.
      */
     public function __construct()
@@ -98,7 +88,7 @@ abstract class Repository
      */
     public function select(string $columnFields = '*', ...$conditions): ?object
     {
-        return $this->dao->setCastClass($this->castClass)->select($columnFields, ...$conditions);
+        return $this->dao->select($columnFields, ...$conditions);
     }
 
     /**
@@ -109,7 +99,7 @@ abstract class Repository
      */
     public function selectALL(string $columnFields = '*', ...$conditions): ?array
     {
-        return $this->dao->setCastClass($this->castClass)->selectALL($columnFields, ...$conditions);
+        return $this->dao->selectALL($columnFields, ...$conditions);
     }
 
     /**
@@ -131,7 +121,7 @@ abstract class Repository
      */
     public function getOne(string $sql, ...$parameters): ?object
     {
-        return $this->dao->setCastClass($this->castClass)->getOne($sql, ...$parameters);
+        return $this->dao->getOne($sql, ...$parameters);
     }
 
     /**
@@ -142,7 +132,7 @@ abstract class Repository
      */
     public function getList(string $sql, ...$parameters): ?array
     {
-        return $this->dao->setCastClass($this->castClass)->getList($sql, ...$parameters);
+        return $this->dao->getList($sql, ...$parameters);
     }
 
     /**
@@ -171,6 +161,18 @@ abstract class Repository
     }
 
     /**
+     * 查询数量
+     * @param string $columnField
+     * @param array|null $conditions
+     * @param ...$parameters
+     * @return int
+     */
+    public function getCount(string $columnField = '*', array $conditions = null, ...$parameters): int
+    {
+        return $this->dao->getCount($columnField, $conditions, ...$parameters);
+    }
+
+    /**
      * @param string $table 表名
      */
     protected function setDAO(string $table): void
@@ -185,8 +187,7 @@ abstract class Repository
      */
     protected function setCastClass(string $castClass = null): Repository
     {
-        if (!is_null($this->castClass)) $this->castClassBak = $this->castClass;
-        $this->castClass = $castClass;
+        $this->dao->setCastClass($castClass);
         return $this;
     }
 
@@ -196,7 +197,7 @@ abstract class Repository
      */
     protected function restoreCastClass(): Repository
     {
-        $this->castClass = $this->castClassBak;
+        $this->dao->restoreCastClass();
         return $this;
     }
 }

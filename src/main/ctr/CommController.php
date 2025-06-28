@@ -70,7 +70,7 @@ abstract class CommController implements Controller
             (new Curl())->setUrl($url)
                 ->setDefaultTimeout()
                 ->setDefaultUserAgent()
-                ->setReferer('https://www.baidu.com')
+                ->setAutoGenerateReferer(true)
         );
     }
 

@@ -98,10 +98,13 @@ abstract class AuthController extends CommController
 
     /**
      * 是否授权
+     * @param bool $output
+     * @return string|null
      */
-    protected final function isAuthorization(): void
+    protected final function isAuthorization(bool $output = true): ?string
     {
-        if (!$this->getAuthorization()->isAuth()) die('Unauthorized.');
+        $alert = 'Unauthorized.';
+        return !$this->getAuthorization()->isAuth() ? $output ? die($alert) : $alert : NULL;
     }
 
     /**

@@ -13,16 +13,10 @@ use lanlj\fw\util\CurlUtil;
 final class UniCurl
 {
     /**
-     * cURL配置
+     * cURL对象
      * @var Curl
      */
     private Curl $curl;
-
-    /**
-     * cURL句柄信息
-     * @var array
-     */
-    private array $cURLInfo = [];
 
     /**
      * UniCurl constructor.
@@ -52,14 +46,6 @@ final class UniCurl
     }
 
     /**
-     * @return array
-     */
-    public function getCURLInfo(): array
-    {
-        return $this->cURLInfo;
-    }
-
-    /**
      * UniCurl destructor.
      */
     public function __destruct()
@@ -69,9 +55,9 @@ final class UniCurl
 
     /**
      * 执行GET操作
-     * @return array
+     * @return CurlPacket
      */
-    public function get(): array
+    public function get(): CurlPacket
     {
         return $this->exec($this->curl->get());
     }
@@ -79,63 +65,57 @@ final class UniCurl
     /**
      * 执行总操作
      * @param resource $ch
-     * @return array
+     * @return CurlPacket
      */
-    private function exec($ch): array
+    private function exec($ch): CurlPacket
     {
-        $r = curl_exec($ch);
-        $err_no = curl_errno($ch);
-        $err_msg = curl_error($ch);
-        if (!$err_no) {
-            $this->cURLInfo = curl_getinfo($ch);
-            if ($this->curl->isGetRequestHeader())
-                $arr['request_header'] = CurlUtil::parseHeader(curl_getinfo($ch, CURLINFO_HEADER_OUT));
-            if ($this->curl->isGetResponseHeader()) {
-                $headerSize = $this->cURLInfo['header_size']; //获得响应结果里的：头大小
-                $arr['response_header'] = CurlUtil::parseHeader(substr($r, 0, $headerSize)); //根据头大小去获取头内容
-                $arr['response_body'] = substr($r, $headerSize);
-            } else $arr['response_body'] = $r;
-        } else {
-            $arr['err_no'] = $err_no;
-            $arr['err_msg'] = $err_msg;
+        $result = curl_exec($ch);
+        $packet = new CurlPacket(curl_errno($ch), curl_error($ch), curl_getinfo($ch));
+        if ($packet->getErrNo() == 0) {
+            if ($this->curl->isGetRequestHeaders())
+                $packet->setRequestHeaders(CurlUtil::parseHeaders(curl_getinfo($ch, CURLINFO_HEADER_OUT)));
+            if ($this->curl->isGetResponseHeaders()) {
+                $headerSize = $packet->getCURLInfo()['header_size']; //获得句柄信息里的头大小
+                $packet->setResponseHeaders(CurlUtil::parseHeaders(substr($result, 0, $headerSize))); //根据头大小去获取头内容
+                $packet->setResponseBody(substr($result, $headerSize));
+            } else $packet->setResponseBody($result);
         }
-
         curl_close($ch);
-        return $arr;
+        return $packet;
     }
 
     /**
      * 执行POST操作
-     * @return array
+     * @return CurlPacket
      */
-    public function post(): array
+    public function post(): CurlPacket
     {
         return $this->exec($this->curl->post());
     }
 
     /**
      * 执行POST FILE操作
-     * @return array
+     * @return CurlPacket
      */
-    public function postFile(): array
+    public function postFile(): CurlPacket
     {
         return $this->exec($this->curl->postFile());
     }
 
     /**
      * 执行SAFE POST FILE操作
-     * @return array
+     * @return CurlPacket
      */
-    public function postFileSafety(): array
+    public function postFileSafety(): CurlPacket
     {
         return $this->exec($this->curl->postFileSafety());
     }
 
     /**
      * 执行HEAD操作
-     * @return array
+     * @return CurlPacket
      */
-    public function head(): array
+    public function head(): CurlPacket
     {
         return $this->exec($this->curl->head());
     }

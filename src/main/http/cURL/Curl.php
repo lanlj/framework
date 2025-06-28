@@ -23,15 +23,15 @@ final class Curl implements BeanMapping
 
     /**
      * 请求网址
-     * @var string|null
+     * @var string
      */
-    private ?string $url = null;
+    private string $url;
 
     /**
-     * 请求参数
+     * 请求数据
      * @var Arrays
      */
-    private Arrays $data;
+    private Arrays $payload;
 
     /**
      * 请求头
@@ -40,22 +40,22 @@ final class Curl implements BeanMapping
     private Arrays $headers;
 
     /**
-     * 是否CA认证
+     * 是否CA验证
      * @var bool
      */
-    private bool $CA = false;
+    private bool $verifyPeer = false;
 
     /**
      * 获取请求头
      * @var bool
      */
-    private bool $getRequestHeader = false;
+    private bool $getRequestHeaders = false;
 
     /**
      * 获取响应头
      * @var bool
      */
-    private bool $getResponseHeader = false;
+    private bool $getResponseHeaders = false;
 
     /**
      * 自动生成来源页
@@ -69,18 +69,18 @@ final class Curl implements BeanMapping
      */
     public function __construct($ch = null)
     {
-        $this->data = new Arrays();
+        $this->payload = new Arrays();
         $this->headers = new Arrays();
-        $this->setCh($ch);
+        $this->setCurlHandle($ch);
     }
 
     /**
      * @param resource $ch
      * @return $this
      */
-    public function setCh($ch): self
+    public function setCurlHandle($ch): self
     {
-        $this->closeCh();
+        $this->closeCurlHandle();
         if (!is_resource($ch)) $ch = curl_init();
         $this->ch = $ch;
         return $this;
@@ -89,7 +89,7 @@ final class Curl implements BeanMapping
     /**
      * Close resource
      */
-    private function closeCh(): void
+    private function closeCurlHandle(): void
     {
         if (is_resource($this->ch)) curl_close($this->ch);
     }
@@ -104,25 +104,25 @@ final class Curl implements BeanMapping
     }
 
     /**
-     * 设置请求参数
-     * @param array|object $data
+     * 设置请求数据
+     * @param array|object $payload
      * @return $this
      */
-    public function setData($data): self
+    public function setPayload($payload): self
     {
-        $this->data->clear()->addAll(ArrayUtil::toArray($data));
+        $this->payload->clear()->addAll(ArrayUtil::toArray($payload));
         return $this;
     }
 
     /**
      * 设置请求头
-     * @param string $key
+     * @param string $name
      * @param mixed $value
      * @return $this
      */
-    public function setHeader(string $key, $value): self
+    public function setHeader(string $name, $value): self
     {
-        $this->headers->add($value, $key);
+        $this->headers->add($value, $name);
         return $this;
     }
 
@@ -147,31 +147,31 @@ final class Curl implements BeanMapping
     }
 
     /**
-     * @param bool $CA
+     * @param bool $verifyPeer
      * @return $this
      */
-    public function setCA(bool $CA): self
+    public function setVerifyPeer(bool $verifyPeer): self
     {
-        $this->CA = $CA;
+        $this->verifyPeer = $verifyPeer;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function isGetRequestHeader(): bool
+    public function isGetRequestHeaders(): bool
     {
-        return $this->getRequestHeader;
+        return $this->getRequestHeaders;
     }
 
     /**
-     * @param bool $getRequestHeader
+     * @param bool $getRequestHeaders
      * @return self
      */
-    public function setGetRequestHeader(bool $getRequestHeader): self
+    public function setGetRequestHeaders(bool $getRequestHeaders): self
     {
-        $this->getRequestHeader = $getRequestHeader;
-        return $this->setOpt(CURLINFO_HEADER_OUT, $getRequestHeader); //请求头部
+        $this->getRequestHeaders = $getRequestHeaders;
+        return $this->setOpt(CURLINFO_HEADER_OUT, $getRequestHeaders); //获取请求头
     }
 
     /**
@@ -189,19 +189,19 @@ final class Curl implements BeanMapping
     /**
      * @return bool
      */
-    public function isGetResponseHeader(): bool
+    public function isGetResponseHeaders(): bool
     {
-        return $this->getResponseHeader;
+        return $this->getResponseHeaders;
     }
 
     /**
-     * @param bool $getResponseHeader
+     * @param bool $getResponseHeaders
      * @return $this
      */
-    public function setGetResponseHeader(bool $getResponseHeader): self
+    public function setGetResponseHeaders(bool $getResponseHeaders): self
     {
-        $this->getResponseHeader = $getResponseHeader;
-        return $this->setOpt(CURLOPT_HEADER, $getResponseHeader); //响应头部
+        $this->getResponseHeaders = $getResponseHeaders;
+        return $this->setOpt(CURLOPT_HEADER, $getResponseHeaders); //获取响应头
     }
 
     /**
@@ -261,11 +261,23 @@ final class Curl implements BeanMapping
     }
 
     /**
+     * 设置是否跟随重定向以及重定向次数
+     * @param bool $followLocation
+     * @param int $maxRedirs
+     * @return $this
+     */
+    public function setFollowLocation(bool $followLocation, int $maxRedirs = 0): self
+    {
+        $this->setOpt(CURLOPT_FOLLOWLOCATION, $followLocation);
+        return $maxRedirs < 1 ? $this : $this->setOpt(CURLOPT_MAXREDIRS, $maxRedirs);
+    }
+
+    /**
      * Curl destructor.
      */
     public function __destruct()
     {
-        $this->closeCh();
+        $this->closeCurlHandle();
     }
 
     /**
@@ -275,7 +287,7 @@ final class Curl implements BeanMapping
     public function get()
     {
         $url = (new Url($this->url))
-            ->addParamList($this->data->getArray());
+            ->addParamList($this->payload->getArray());
         return $this->setUrl($url->build())
             ->setOpt(CURLOPT_CUSTOMREQUEST, 'GET')
             ->beforeInit()->ch;
@@ -287,7 +299,7 @@ final class Curl implements BeanMapping
      */
     private function beforeInit(): self
     {
-        $this->setOpt(CURLOPT_RETURNTRANSFER, 1); //不直接输出返回值
+        $this->setOpt(CURLOPT_RETURNTRANSFER, true); //不直接输出返回值
         $urlInfo = new Url($this->url);
         if ($this->autoGenerateReferer) {
             if (!is_null($scheme = $urlInfo->get(Url::SCHEME)) && !is_null($host = $urlInfo->get(Url::HOST))) {
@@ -297,11 +309,11 @@ final class Curl implements BeanMapping
         }
         $cacert = dirname(__FILE__) . '/../../../resources/cacert.pem'; //CA根证书
         $SSL = 'https' == $urlInfo->get(Url::SCHEME);
-        if ($SSL && $this->CA) {
+        if ($SSL && $this->verifyPeer) {
             $this->setOpt(CURLOPT_SSL_VERIFYPEER, true); //只信任CA颁布的证书
             $this->setOpt(CURLOPT_CAINFO, $cacert); //CA根证书（用来验证的网站证书是否是CA颁布）
             $this->setOpt(CURLOPT_SSL_VERIFYHOST, 2); //检查证书中是否设置域名，并且是否与提供的主机名匹配
-        } elseif ($SSL && !$this->CA) {
+        } elseif ($SSL && !$this->verifyPeer) {
             $this->setOpt(CURLOPT_SSL_VERIFYPEER, false); //信任任何证书
             $this->setOpt(CURLOPT_SSL_VERIFYHOST, 0); //不检查证书
         }
@@ -331,7 +343,7 @@ final class Curl implements BeanMapping
     public function post()
     {
         return $this->setOpt(CURLOPT_POST, true)
-            ->setOpt(CURLOPT_POSTFIELDS, $this->data->toQueryString())
+            ->setOpt(CURLOPT_POSTFIELDS, $this->payload->toQueryString())
             ->beforeInit()->ch;
     }
 
@@ -343,7 +355,7 @@ final class Curl implements BeanMapping
     {
         return $this->setOpt(CURLOPT_POST, true)
             ->setOpt(CURLOPT_SAFE_UPLOAD, false)
-            ->setOpt(CURLOPT_POSTFIELDS, $this->data->getArray())
+            ->setOpt(CURLOPT_POSTFIELDS, $this->payload->getArray())
             ->beforeInit()->ch;
     }
 
@@ -355,7 +367,7 @@ final class Curl implements BeanMapping
     {
         return $this->setOpt(CURLOPT_POST, true)
             ->setOpt(CURLOPT_SAFE_UPLOAD, true)
-            ->setOpt(CURLOPT_POSTFIELDS, $this->data->getArray())
+            ->setOpt(CURLOPT_POSTFIELDS, $this->payload->getArray())
             ->beforeInit()->ch;
     }
 
@@ -367,6 +379,6 @@ final class Curl implements BeanMapping
     {
         return $this->setOpt(CURLOPT_NOBODY, true)
             ->setOpt(CURLOPT_CUSTOMREQUEST, 'HEAD')
-            ->setGetResponseHeader(true)->beforeInit()->ch;
+            ->setGetResponseHeaders(true)->beforeInit()->ch;
     }
 }

@@ -12,20 +12,18 @@ class CurlUtil
 {
     /**
      * 解析头部字符串
-     * @param string|null $header
+     * @param string|null $strHeaders
      * @return array
      */
-    public static function parseHeader(?string $header): array
+    public static function parseHeaders(?string $strHeaders): array
     {
-        $headArr = explode(PHP_EOL, $header);
+        $headerArr = explode(PHP_EOL, $strHeaders);
         $headers = array();
-        foreach ($headArr as $value) {
-            if (Utils::isEmpty($value))
-                continue;
-            $item = explode(': ', $value, 2);
-            if (count($item) == 2)
-                $headers[$item[0]] = trim($item[1]);
-            else $headers[] = trim($value);
+        foreach ($headerArr as $header) {
+            if (Utils::isEmpty($header)) continue;
+            $item = explode(': ', $header, 2);
+            if (count($item) != 2) $headers[] = trim($header);
+            else $headers[$item[0]] = trim($item[1]);
         }
         return $headers;
     }

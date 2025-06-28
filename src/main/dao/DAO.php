@@ -10,7 +10,8 @@
 namespace lanlj\fw\dao;
 
 use ezsql\ezsqlModel;
-use lanlj\fw\util\DBUtil;
+use lanlj\fw\core\Strings;
+use lanlj\fw\util\{DBUtil, Utils};
 use function ezsql\functions\limit;
 
 class DAO
@@ -33,7 +34,7 @@ class DAO
     /**
      * @var string|null
      */
-    private ?string $castClassBak = null;
+    private ?string $castClassBak;
 
     /**
      * DAO constructor.
@@ -185,5 +186,19 @@ class DAO
     public function getVar(string $sql, int $col = 0, int $row = 0, ...$parameters)
     {
         return $this->dbo->get_var(DBUtil::preparedSQL($sql, ...$parameters), $col, $row);
+    }
+
+    /**
+     * 查询数量
+     * @param string $columnField
+     * @param array|null $conditions
+     * @param mixed ...$parameters
+     * @return int
+     */
+    public function getCount(string $columnField = '*', array $conditions = null, ...$parameters): int
+    {
+        $sql = new Strings("SELECT COUNT($columnField) FROM $this->table ");
+        $sql->concat(str_replace('__ez__', '?', implode(' ', $conditions ?? [])));
+        return Utils::getVal($this->dbo->get_var(DBUtil::preparedSQL($sql->getString(), ...$parameters)), 0);
     }
 }
