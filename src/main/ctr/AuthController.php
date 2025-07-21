@@ -11,7 +11,7 @@ namespace lanlj\fw\ctr;
 use lanlj\fw\app\Application;
 use lanlj\fw\auth\Authorization;
 use lanlj\fw\auth\po\{Account, Token};
-use lanlj\fw\core\{Arrays, Strings};
+use lanlj\fw\base\{Arrays, Strings};
 use lanlj\fw\http\storage\{Cookie, Session};
 use lanlj\fw\repo\{Repository, TokenRepo};
 use lanlj\fw\util\{BooleanUtil, JsonUtil, Utils};

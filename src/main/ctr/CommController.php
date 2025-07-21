@@ -60,6 +60,34 @@ abstract class CommController implements Controller
     }
 
     /**
+     * 快速开始服务
+     * @param array $actions
+     * @param string|null $action
+     * @return int
+     */
+    protected function quickService(array $actions, ?string $action): int
+    {
+        if (!is_null($val = $actions[$action])) {
+            if (is_array($val)) {
+                @call_user_func_array(array($this, "validateRequest"), (array)$val[1]);
+                $val = $val[0];
+            }
+            return call_user_func(array($this, $val));
+        }
+        return 400;
+    }
+
+    /**
+     * 验证请求方式
+     * @param string ...$methods
+     * @return void
+     */
+    protected function validateRequest(string ...$methods): void
+    {
+        $this->req->requestMethods(true, null, ...$methods);
+    }
+
+    /**
      * 获取Curl实例
      * @param string $url
      * @return UniCurl
@@ -97,21 +125,23 @@ abstract class CommController implements Controller
     /**
      * 只允许GET请求
      * @param bool $output
+     * @param string|null $message
      * @return string|null
      */
-    protected function onlyGET(bool $output = true): ?string
+    protected function onlyGET(bool $output = true, string $message = null): ?string
     {
-        return $this->req->requestMethods($output, Request::GET);
+        return $this->req->requestMethods($output, $message, Request::GET);
     }
 
     /**
      * 只允许POST请求
      * @param bool $output
+     * @param string|null $message
      * @return string|null
      */
-    protected function onlyPOST(bool $output = true): ?string
+    protected function onlyPOST(bool $output = true, string $message = null): ?string
     {
-        return $this->req->requestMethods($output, Request::POST);
+        return $this->req->requestMethods($output, $message, Request::POST);
     }
 
     private function __clone()

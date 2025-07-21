@@ -12,8 +12,8 @@ namespace lanlj\fw\proxy;
 use DateTime;
 use Exception;
 use lanlj\fw\app\Application;
+use lanlj\fw\base\Strings;
 use lanlj\fw\bean\BeanInstance;
-use lanlj\fw\core\Strings;
 use lanlj\fw\util\{FileUtil, JsonUtil};
 
 class SqlLogProxy implements BeanInstance

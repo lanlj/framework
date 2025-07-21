@@ -9,7 +9,6 @@
 
 namespace lanlj\eg\ctr;
 
-use lanlj\fw\core\Arrays;
 use lanlj\fw\ctr\CommController;
 
 class TestController extends CommController
@@ -28,25 +27,21 @@ class TestController extends CommController
      */
     public function service(): int
     {
-        $act = $this->getParam("act");
-        $acts = new Arrays($this->acts);
-        if ($acts->getKeys()->contains($act)) {
-            echo call_user_func_array(array($this, $acts->get($act)), array());
-            return 1;
-        }
         echo "This is test page." . PHP_EOL;
         echo "Visited " . $this->req->getSession()->getAttribute("views") . " times." . PHP_EOL;
-        return 200;
+        return $this->quickService($this->acts, $this->getParam("act"));
     }
 
     /**
      * 测试获取请求体数据
+     * @return int
      */
-    private function testRequestBody()
+    protected function testRequestBody(): int
     {
         ob_end_clean();
         $this->onlyPOST();
         var_dump($_POST);
         echo $this->req->getRequestBody();
+        return 200;
     }
 }

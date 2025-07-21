@@ -8,8 +8,8 @@
 
 namespace lanlj\fw\app;
 
+use lanlj\fw\base\{Arrays, Strings};
 use lanlj\fw\bean\BeanInstance;
-use lanlj\fw\core\{Arrays, Strings};
 use lanlj\fw\db\DB;
 use lanlj\fw\filter\Filter;
 use lanlj\fw\http\{Request, Response};

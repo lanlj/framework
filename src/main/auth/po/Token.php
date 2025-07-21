@@ -8,11 +8,11 @@
 
 namespace lanlj\fw\auth\po;
 
-use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
+use lanlj\fw\bean\{ArrayBean, BeanMapping};
 use lanlj\fw\util\{ArrayUtil, Utils};
 
-class Token implements BeanMapping
+class Token implements BeanMapping, ArrayBean
 {
     /**
      * ID
@@ -144,9 +144,9 @@ class Token implements BeanMapping
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
-    public function toArray(): array
+    public function toArray(...$args): array
     {
         $data = ArrayUtil::toArray($this, false, true, true);
         $data['account_id'] = $data['account_id']['id'];

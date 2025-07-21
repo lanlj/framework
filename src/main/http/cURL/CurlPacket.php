@@ -9,8 +9,8 @@
 
 namespace lanlj\fw\http\cURL;
 
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 
 final class CurlPacket implements BeanMapping
 {

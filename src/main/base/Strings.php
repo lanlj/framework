@@ -6,7 +6,7 @@
  * Time: 23:44
  */
 
-namespace lanlj\fw\core;
+namespace lanlj\fw\base;
 
 class Strings
 {

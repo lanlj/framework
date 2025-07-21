@@ -10,7 +10,7 @@
 namespace lanlj\fw\dao;
 
 use ezsql\ezsqlModel;
-use lanlj\fw\core\Strings;
+use lanlj\fw\base\Strings;
 use lanlj\fw\util\{DBUtil, Utils};
 use function ezsql\functions\limit;
 

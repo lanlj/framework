@@ -8,8 +8,8 @@
 
 namespace lanlj\fw\auth\po;
 
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 
 class Account implements BeanMapping
 {

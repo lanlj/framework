@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\util;
 
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 
 class StringUtil
 {

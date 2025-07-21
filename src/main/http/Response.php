@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\http;
 
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 use lanlj\fw\http\storage\Cookie;
 use lanlj\fw\util\{ArrayUtil, JsonUtil, Utils};
 

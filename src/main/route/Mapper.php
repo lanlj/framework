@@ -8,8 +8,8 @@
 
 namespace lanlj\fw\route;
 
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 
 class Mapper implements BeanMapping
 {

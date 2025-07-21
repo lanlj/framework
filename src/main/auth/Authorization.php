@@ -9,8 +9,8 @@
 namespace lanlj\fw\auth;
 
 use lanlj\fw\auth\po\Token;
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 
 class Authorization implements BeanMapping
 {

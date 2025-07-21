@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\http;
 
-use lanlj\fw\core\{Arrays, Strings};
+use lanlj\fw\base\{Arrays, Strings};
 use lanlj\fw\http\storage\{Cookie, Session};
 use lanlj\fw\http\url\Url;
 
@@ -292,13 +292,17 @@ final class Request
     /**
      * 指定请求方式
      * @param bool $output
+     * @param string|null $message
+     * @param string $method
      * @param string ...$methods
      * @return string|null
      */
-    public function requestMethods(bool $output = true, string ...$methods): ?string
+    public function requestMethods(bool $output, ?string $message, string $method, string ...$methods): ?string
     {
-        $alert = "Request method '" . ($method = $this->getMethod()) . "' not supported.";
-        return !in_array($method, $methods) ? $output ? die($alert) : $alert : NULL;
+        $alert = !is_null($message) ? $message : "Request method '%s' not supported.";
+        $alert = sprintf($alert, $md = $this->getMethod());
+        $methods = array_map('strtoupper', array_merge([$method], $methods));
+        return !in_array($md, $methods) ? $output ? die($alert) : $alert : NULL;
     }
 
     /**

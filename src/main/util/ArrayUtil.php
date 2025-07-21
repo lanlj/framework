@@ -11,7 +11,7 @@ namespace lanlj\fw\util;
 use DOMDocument;
 use DOMElement;
 use Exception;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 use ReflectionObject;
 use stdClass;
 

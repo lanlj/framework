@@ -9,8 +9,8 @@
 namespace lanlj\fw\util;
 
 use Exception;
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\{BeanInstance, BeanMapping};
-use lanlj\fw\core\Arrays;
 use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;

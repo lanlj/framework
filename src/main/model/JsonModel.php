@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\model;
 
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 
 class JsonModel
 {

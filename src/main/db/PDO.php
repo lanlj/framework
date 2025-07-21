@@ -11,7 +11,7 @@ namespace lanlj\fw\db;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_pdo;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 
 class PDO extends DB
 {

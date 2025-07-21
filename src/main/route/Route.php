@@ -9,7 +9,7 @@
 namespace lanlj\fw\route;
 
 use lanlj\fw\app\Application;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 use lanlj\fw\ctr\Controller;
 use lanlj\fw\http\Request;
 use lanlj\fw\route\exception\HttpError;

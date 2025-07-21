@@ -6,7 +6,7 @@
  * Time: 1:02
  */
 
-namespace lanlj\fw\core;
+namespace lanlj\fw\base;
 
 use lanlj\fw\util\{ArrayUtil, JsonUtil, Utils};
 use ReflectionException;
@@ -148,8 +148,7 @@ class Arrays
      */
     public function get(string $key, $default = null)
     {
-        $v = array_key_exists($key, $this->array) ? $this->array[$key] : $default;
-        return Utils::getVal($v, $default);
+        return Utils::getVal($this->array[$key], $default);
     }
 
     /**

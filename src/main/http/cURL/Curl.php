@@ -8,8 +8,8 @@
 
 namespace lanlj\fw\http\cURL;
 
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 use lanlj\fw\http\url\Url;
 use lanlj\fw\util\ArrayUtil;
 

@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\http\url;
 
-use lanlj\fw\core\{Arrays, Strings};
+use lanlj\fw\base\{Arrays, Strings};
 
 final class Url
 {

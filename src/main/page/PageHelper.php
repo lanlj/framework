@@ -9,7 +9,7 @@
 
 namespace lanlj\fw\page;
 
-use lanlj\fw\core\Strings;
+use lanlj\fw\base\Strings;
 use lanlj\fw\repo\Repository;
 use lanlj\fw\util\BooleanUtil;
 use function ezsql\functions\limit;
@@ -82,7 +82,7 @@ class PageHelper
     }
 
     /**
-     * @param ...$conditions
+     * @param mixed ...$conditions
      * @return array
      */
     public function getConditions(...$conditions): array
@@ -94,7 +94,7 @@ class PageHelper
     }
 
     /**
-     * @param array $parameters
+     * @param mixed ...$parameters
      * @return $this
      */
     public function setParameters(...$parameters): self

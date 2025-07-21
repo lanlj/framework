@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\util;
 
-use lanlj\fw\core\Strings;
+use lanlj\fw\base\Strings;
 
 class DBUtil
 {

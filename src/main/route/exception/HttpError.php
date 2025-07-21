@@ -9,8 +9,8 @@
 
 namespace lanlj\fw\route\exception;
 
+use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
-use lanlj\fw\core\Arrays;
 
 class HttpError implements BeanMapping
 {

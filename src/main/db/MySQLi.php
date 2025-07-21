@@ -12,7 +12,7 @@ namespace lanlj\fw\db;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_mysqli;
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 
 class MySQLi extends DB
 {

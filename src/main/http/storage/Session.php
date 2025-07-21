@@ -8,7 +8,7 @@
 
 namespace lanlj\fw\http\storage;
 
-use lanlj\fw\core\Arrays;
+use lanlj\fw\base\Arrays;
 
 final class Session
 {
