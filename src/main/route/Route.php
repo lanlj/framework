@@ -55,23 +55,24 @@ class Route
 
         // 检测访问路径是不是PHP_SELF
         if ($_SERVER['PHP_SELF'] === $this->app->getRequestPath(false)) {
-            $_403 = HttpError::mapping($httpErrs->get(403));
+            $_403 = HttpError::mapping($httpErrs[403]);
             header($_403->getErrHeader());
             die($_403->getErrMessage());
         }
 
         $this->route = new Arrays(
-            ['httpErrs' => $httpErrs->getArray()]
+            ['httpErrs' => $httpErrs]
         ); // 初始化路由
+        $this->setRouteFile('./src/resources/route.json');
     }
 
     /**
      * 默认HTTP错误列表
-     * @return Arrays
+     * @return array
      */
-    protected function getDefaultHttpErrs(): Arrays
+    protected function getDefaultHttpErrs(): array
     {
-        return new Arrays([
+        return [
             400 => new HttpError(
                 "HTTP/1.1 400 Bad Request",
                 '<html lang="en"><title>400 Bad Request</title><body>400 Bad Request</body></html>'
@@ -88,7 +89,18 @@ class Route
                 'HTTP/1.1 500 Internal Server Error',
                 '<html lang="en"><title>500 Internal Server Error</title><body>500 Internal Server Error</body></html>'
             )
-        ]);
+        ];
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     */
+    public function setRouteFile(string $file): self
+    {
+        if (is_file($file))
+            $this->route->addAll(json_decode(file_get_contents($file), true));
+        return $this;
     }
 
     /**
@@ -221,11 +233,12 @@ class Route
         if ($status != 200) {
             ob_end_clean(); // 删除缓冲区内容并关闭
             header('Content-Type: text/html; charset=utf-8');
-        }
-        $httpErr = $this->getHttpErr($status);
-        if (!is_null($httpErr)) {
-            header($httpErr->getErrHeader());
-            die($httpErr->getErrMessage());
+
+            $httpErr = $this->getHttpErr($status);
+            if (!is_null($httpErr)) {
+                header($httpErr->getErrHeader());
+                die($httpErr->getErrMessage());
+            }
         }
     }
 

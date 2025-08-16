@@ -8,12 +8,13 @@
 
 namespace lanlj\fw\util;
 
+use Error;
 use Exception;
 use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\{BeanInstance, BeanMapping};
 use ReflectionClass;
 use ReflectionObject;
-use ReflectionProperty;
+use stdClass;
 
 class BeanUtil
 {
@@ -25,65 +26,90 @@ class BeanUtil
      */
     public static function populates(array $values, $class, bool $db = false): array
     {
-        $objs = [];
+        $objects = [];
         foreach ($values as $value) {
             $obj = self::populate($value, $class, $db);
-            if (!is_null($obj)) $objs[] = $obj;
+            if (!is_null($obj)) $objects[] = $obj;
         }
-        return $objs;
+        return $objects;
     }
 
     /**
      * NULL is returned if the specified class is not exist.
      * @param object|array $value
-     * @param mixed $class
+     * @param string|object $class
      * @param bool $db
      * @return object|null
      */
     public static function populate($value, $class, bool $db = false): ?object
     {
+        if (!is_string($class) && !is_object($class)) return NULL;
         if (!is_object($value) && !is_array($value)) return NULL;
+        if ($value instanceof $class) return $value;
         $values = new Arrays($value);
         if ($values->isEmpty()) return NULL;
         if (is_subclass_of($class, BeanMapping::class))
             return call_user_func(array($class, 'mapping'), $value);
         $obj = self::newInstance($class);
         if (is_null($obj)) return NULL;
+        if ($obj instanceof stdClass) return (object)$values->getArray();
         $ref = new ReflectionObject($obj);
-        foreach ($ref->getProperties() as $property) {
-            $name = $property->getName();
-            $value = $values->get(self::getColumnName($property, $db));
-            $otherWays = true;
-            $_name = str_replace('_', '', $name);
-            if ($ref->hasMethod($mn = 'set' . ucwords($_name)) || $ref->hasMethod($mn = 'set' . strtoupper($_name))) {
-                try {
+        $properties = $ref->getProperties();
+        $parent = $ref->getParentClass();
+        while (true) {
+            if ($parent === false) break;
+            $properties = array_merge($parent->getProperties(), $properties);
+            $parent = $parent->getParentClass();
+        }
+        foreach ($properties as $property) {
+            try {
+                $name = $property->getName();
+                $value = $values->get(DBUtil::getColumnName($property, $db));
+
+                if ($property->hasType()) {
+                    $type = $property->getType();
+                    if (!$type->isBuiltin()) {
+                        $value = self::populate($value, $type->getName(), $db);
+                    }
+                    if (is_null($value) && !$type->allowsNull()) {
+                        $property->setAccessible(true);
+                        if ($property->isInitialized($obj)) {
+                            $value = $property->getValue($obj);
+                        } else continue;
+                    }
+                }
+
+                $otherWays = true;
+                $_name = str_replace('_', '', $name);
+                if ($ref->hasMethod($mn = 'set' . ucwords($_name)) || $ref->hasMethod($mn = 'set' . strtoupper($_name))) {
                     $method = $ref->getMethod($mn);
                     $method->setAccessible(true);
                     $method->invoke($obj, $value);
                     $otherWays = false;
-                } catch (Exception $e) {
                 }
-            }
-            if ($otherWays) {
-                if ($ref->hasMethod('__set'))
-                    $obj->$name = $value;
-                else {
-                    $property->setAccessible(true);
-                    $property->setValue($obj, $value);
+                if ($otherWays) {
+                    if ($ref->hasMethod('__set'))
+                        $obj->$name = $value;
+                    else {
+                        $property->setAccessible(true);
+                        $property->setValue($obj, $value);
+                    }
                 }
+            } catch (Error | Exception $e) {
+                continue;
             }
         }
         return $obj;
     }
 
     /**
-     * @param mixed $class
+     * @param string|object $class
      * @return object|null
      */
     public static function newInstance($class): ?object
     {
         if (is_object($class)) return $class;
-        if (!class_exists($class)) return null;
+        if (is_string($class) && !class_exists($class)) return null;
         if (is_subclass_of($class, BeanInstance::class))
             return call_user_func(array($class, 'newInstance'));
         try {
@@ -108,17 +134,5 @@ class BeanUtil
         } catch (Exception $e) {
             return null;
         }
-    }
-
-    /**
-     * @param ReflectionProperty $property
-     * @param bool $db
-     * @return string
-     */
-    public static function getColumnName(ReflectionProperty $property, bool $db = false): ?string
-    {
-        return $db && preg_match('/@column\([\'"]([A-Za-z0-9_]+)[\'"]\)/', $property->getDocComment(), $matches) == 1
-            ? $matches[1]
-            : $property->getName();
     }
 }

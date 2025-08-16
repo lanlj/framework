@@ -9,9 +9,22 @@
 namespace lanlj\fw\util;
 
 use lanlj\fw\base\Strings;
+use ReflectionProperty;
 
 class DBUtil
 {
+    /**
+     * @param ReflectionProperty $property
+     * @param bool $db
+     * @return string
+     */
+    public static function getColumnName(ReflectionProperty $property, bool $db = false): string
+    {
+        return $db && preg_match('/@column\([\'"]([A-Za-z0-9_]+)[\'"]\)/', $property->getDocComment(), $matches) == 1
+            ? $matches[1]
+            : $property->getName();
+    }
+
     /**
      * 数据处理
      * @param object|array $data

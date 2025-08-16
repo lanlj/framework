@@ -59,11 +59,6 @@ class Application implements BeanInstance
     private static Response $_response;
 
     /**
-     * @var string|null
-     */
-    private ?string $appClass;
-
-    /**
      * Application constructor.
      */
     protected function __construct()
@@ -76,7 +71,7 @@ class Application implements BeanInstance
             self::$sysConfig = new Arrays($appConfig->get("sys", []));
             $properties = $appConfig->get("props", []);
             !isset(self::$properties) ? self::$properties = new Arrays($properties) : self::$properties->addAll($properties);
-            $this->appClass = $appConfig->get("@attributes")["class"];
+            $this->setProperty("appClass", $appConfig->get("@attributes")["class"]);
 
             $filters = self::$sysConfig->get("filters", []);
             $filters = $this->arrPackage(Utils::getDefault($filters, "filter", []));
@@ -114,6 +109,15 @@ class Application implements BeanInstance
 
             self::$_started = true;
         }
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setProperty(string $name, $value): void
+    {
+        self::$properties->add($value, $name);
     }
 
     /**
@@ -186,15 +190,6 @@ class Application implements BeanInstance
     public static function getRequest(): Request
     {
         return self::$_request ?? self::$_request = new Request();
-    }
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     */
-    public function setProperty(string $name, $value): void
-    {
-        self::$properties->add($value, $name);
     }
 
     /**
@@ -274,8 +269,8 @@ class Application implements BeanInstance
     {
         if (!isset(self::$_instance)) {
             $instance = new self();
-            if (is_subclass_of($instance->appClass, self::class)) {
-                $instance = call_user_func(array($instance->appClass, "newInstance"));
+            if (is_subclass_of($appClass = $instance->getProperty("appClass"), self::class)) {
+                $instance = call_user_func(array($appClass, "newInstance"));
             }
             self::$_instance = $instance;
         }

@@ -9,11 +9,14 @@
 
 namespace lanlj\fw\bean;
 
-interface ArrayBean
+interface BeanArray
 {
     /**
+     * @param bool $onlyPublic
+     * @param bool $all
+     * @param bool $db
      * @param mixed ...$args
      * @return array
      */
-    public function toArray(...$args): array;
+    public function toArray(bool $onlyPublic = true, bool $all = false, bool $db = false, ...$args): array;
 }

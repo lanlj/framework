@@ -74,7 +74,7 @@ abstract class CommController implements Controller
             }
             return call_user_func(array($this, $val));
         }
-        return 400;
+        return 404;
     }
 
     /**

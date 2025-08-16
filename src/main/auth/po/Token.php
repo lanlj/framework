@@ -9,10 +9,10 @@
 namespace lanlj\fw\auth\po;
 
 use lanlj\fw\base\Arrays;
-use lanlj\fw\bean\{ArrayBean, BeanMapping};
+use lanlj\fw\bean\{BeanArray, BeanMapping};
 use lanlj\fw\util\{ArrayUtil, Utils};
 
-class Token implements BeanMapping, ArrayBean
+class Token implements BeanMapping, BeanArray
 {
     /**
      * ID
@@ -70,6 +70,39 @@ class Token implements BeanMapping, ArrayBean
     }
 
     /**
+     * @inheritDoc
+     */
+    public function toArray(bool $onlyPublic = true, bool $all = false, bool $db = false, ...$args): array
+    {
+        $account = $all ? ArrayUtil::toArray($this->getAccount(), $onlyPublic, $all, $db) : $this->getAccount();
+        $vars = [
+            'id' => $this->getId(), 'token' => $this->getToken(),
+            !$db ? 'account' : 'account_id' => $account, 'expires' => $this->getExpires()
+        ];
+        if ($db) $vars['account_id'] = $this->getAccount()->getId();
+
+        return $vars;
+    }
+
+    /**
+     * @return Account|null
+     */
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Account|null $account
+     * @return Token
+     */
+    public function setAccount(?Account $account): Token
+    {
+        $this->account = $account;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getId(): ?string
@@ -107,24 +140,6 @@ class Token implements BeanMapping, ArrayBean
     }
 
     /**
-     * @return Account|null
-     */
-    public function getAccount(): ?Account
-    {
-        return $this->account;
-    }
-
-    /**
-     * @param Account|null $account
-     * @return Token
-     */
-    public function setAccount(?Account $account): Token
-    {
-        $this->account = $account;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getExpires(): string
@@ -141,15 +156,5 @@ class Token implements BeanMapping, ArrayBean
     {
         $this->expires = $expires;
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toArray(...$args): array
-    {
-        $data = ArrayUtil::toArray($this, false, true, true);
-        $data['account_id'] = $data['account_id']['id'];
-        return $data;
     }
 }

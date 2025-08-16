@@ -9,7 +9,9 @@
 
 namespace lanlj\eg\ctr;
 
+use lanlj\eg\po\EntitySon;
 use lanlj\fw\ctr\CommController;
+use lanlj\fw\util\ArrayUtil;
 
 class TestController extends CommController
 {
@@ -19,6 +21,7 @@ class TestController extends CommController
      */
     private array $acts = array(
         'trb' => 'testRequestBody',
+        'teta' => 'testEntityToArray',
     );
 
     /**
@@ -42,6 +45,17 @@ class TestController extends CommController
         $this->onlyPOST();
         var_dump($_POST);
         echo $this->req->getRequestBody();
+        return 200;
+    }
+
+    /**
+     * 测试实体转数组方法
+     * @return int
+     */
+    protected function testEntityToArray(): int
+    {
+        $e = new EntitySon();
+        var_dump($e, $e->toArray($onlyPublic = false, $all = true, $db = true), ArrayUtil::toArray($e, $onlyPublic, $all, $db));
         return 200;
     }
 }

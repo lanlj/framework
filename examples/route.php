@@ -10,9 +10,7 @@ use lanlj\fw\route\{Mapper, Route};
 
 require "./vendor/autoload.php";
 
-$route = Route::getInstance()
-    ->setRoute(json_decode(file_get_contents("./src/resources/route.json"), true))
-    ->setBaseDir("/framework/examples/")->setNamespace('\lanlj\eg\ctr\%s');
+$route = Route::getInstance()->setBaseDir("/framework/examples/")->setNamespace('\lanlj\eg\ctr\%s');
 
 $home = (new Mapper())->setPath(['index.html', 'index.php'])->setName('HomeController');
 

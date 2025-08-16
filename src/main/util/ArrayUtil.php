@@ -12,6 +12,7 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use lanlj\fw\base\Arrays;
+use lanlj\fw\bean\BeanArray;
 use ReflectionObject;
 use stdClass;
 
@@ -79,6 +80,9 @@ class ArrayUtil
         if (is_array($var)) return $var;
         if (!is_object($var)) return [$var];
         if ($var instanceof stdClass) return self::toArray(get_object_vars($var), $onlyPublic, $all, $db);
+        if ($var instanceof BeanArray) return self::toArray(
+            call_user_func(array($var, 'toArray'), $onlyPublic, $all, $db), $onlyPublic, $all, $db
+        );
         $ref = new ReflectionObject($var);
         $properties = $ref->getProperties();
         $parent = $ref->getParentClass();
@@ -112,12 +116,13 @@ class ArrayUtil
                         $value = $var->$name;
                     else {
                         $property->setAccessible(true);
-                        $value = $property->getValue($var);
+                        if ($property->isInitialized($var))
+                            $value = $property->getValue($var);
                     }
                 }
             }
             if ($all && (is_array($value) || is_object($value))) $value = self::toArray($value, $onlyPublic, $all, $db);
-            if (!self::$objectIgnoreNULL || !is_null($value)) $arr[!$db ? $name : BeanUtil::getColumnName($property, $db)] = $value;
+            if (!self::$objectIgnoreNULL || !is_null($value)) $arr[!$db ? $name : DBUtil::getColumnName($property, $db)] = $value;
         }
         return $arr;
     }
