@@ -8,6 +8,7 @@
 
 namespace lanlj\fw\db;
 
+use Error;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_sqlite3;
@@ -38,7 +39,7 @@ class SQLite extends DB
         $this->name = $name;
         try {
             $this->dbo = new ez_sqlite3(new Config('sqlite3', [$this->path, $this->name]));
-        } catch (Exception $e) {
+        } catch (Error | Exception $e) {
         }
     }
 

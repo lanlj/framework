@@ -8,6 +8,7 @@
 
 namespace lanlj\fw\db;
 
+use Error;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_pdo;
@@ -59,7 +60,7 @@ class PDO extends DB
             $this->dbo = new ez_pdo(new Config('pdo', [
                 $this->dsn, $this->user, $this->password, $this->options, $this->isFile
             ]));
-        } catch (Exception $e) {
+        } catch (Error | Exception $e) {
         }
     }
 

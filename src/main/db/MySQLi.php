@@ -9,6 +9,7 @@
 
 namespace lanlj\fw\db;
 
+use Error;
 use Exception;
 use ezsql\Config;
 use ezsql\Database\ez_mysqli;
@@ -69,7 +70,7 @@ class MySQLi extends DB
             $this->dbo = new ez_mysqli(new Config('mysqli', [
                 $this->user, $this->password, $this->name, $this->host, $this->port, $this->charset
             ]));
-        } catch (Exception $e) {
+        } catch (Error | Exception $e) {
         }
     }
 

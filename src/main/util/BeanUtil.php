@@ -128,10 +128,10 @@ class BeanUtil
             }
             try {
                 return $ref->newInstance();
-            } catch (Exception $e) {
+            } catch (Error | Exception $e) {
                 return $ref->newInstanceWithoutConstructor();
             }
-        } catch (Exception $e) {
+        } catch (Error | Exception $e) {
             return null;
         }
     }

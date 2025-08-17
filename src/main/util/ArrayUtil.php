@@ -10,6 +10,7 @@ namespace lanlj\fw\util;
 
 use DOMDocument;
 use DOMElement;
+use Error;
 use Exception;
 use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanArray;
@@ -108,7 +109,7 @@ class ArrayUtil
                         $method->setAccessible(true);
                         $value = $method->invoke($var);
                         $otherWays = false;
-                    } catch (Exception $e) {
+                    } catch (Error | Exception $e) {
                     }
                 }
                 if ($otherWays) {
