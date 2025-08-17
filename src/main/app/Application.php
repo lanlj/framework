@@ -114,10 +114,12 @@ class Application implements BeanInstance
     /**
      * @param string $name
      * @param mixed $value
+     * @return $this
      */
-    public function setProperty(string $name, $value): void
+    public function setProperty(string $name, $value): self
     {
         self::$properties->add($value, $name);
+        return $this;
     }
 
     /**
@@ -221,15 +223,18 @@ class Application implements BeanInstance
     /**
      * 初始化SQL日志代理
      * @param DB|null $db
+     * @return bool
      */
-    protected function initSqlLogProxy(?DB $db): void
+    protected function initSqlLogProxy(?DB $db): bool
     {
         if (!is_null($db) && !is_null($db->getDBO()) && !(new Strings($db->getLogFile()))->trim()->isEmpty()) {
             $sql = self::$sysConfig->get("sql");
             $attrs = Utils::getDefault($sql, "@attributes");
             $proxy = BeanUtil::newInstance($attrs["log-class"]);
             $db->initProxyDBO($proxy instanceof SqlLogProxy ? $proxy : NULL);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -247,6 +252,7 @@ class Application implements BeanInstance
     /**
      * 设置是否修复请求路径(剔除请求路径中多余的斜线)
      * @param bool $fixRequestPath
+     * @return void
      */
     public static function setFixRequestPath(bool $fixRequestPath = true): void
     {
@@ -256,6 +262,7 @@ class Application implements BeanInstance
 
     /**
      * @param string $configPath
+     * @return void
      */
     public static function setConfigPath(string $configPath): void
     {
@@ -278,10 +285,10 @@ class Application implements BeanInstance
     }
 
     /**
-     * @param array ...$_
+     * @param mixed ...$args
      * @return self
      */
-    public static function newInstance(...$_): self
+    public static function newInstance(...$args): self
     {
         return self::$_instance ?? self::$_instance = new static();
     }

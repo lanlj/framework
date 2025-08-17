@@ -96,7 +96,7 @@ final class Curl implements BeanMapping
 
     /**
      * @param object|array $args
-     * @return $this
+     * @return self|null
      */
     public static function mapping($args): ?self
     {

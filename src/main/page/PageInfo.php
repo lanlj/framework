@@ -133,7 +133,8 @@ class PageInfo implements BeanMapping
     }
 
     /**
-     * @inheritDoc
+     * @param object|array $args
+     * @return self
      */
     public static function mapping($args): self
     {

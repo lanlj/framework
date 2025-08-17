@@ -91,7 +91,7 @@ class Mapper implements BeanMapping
 
     /**
      * @param object|array $args
-     * @return $this
+     * @return self
      */
     public static function mapping($args): self
     {

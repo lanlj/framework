@@ -16,7 +16,7 @@ final class CORSFilter implements Filter, BeanMapping
 {
     /**
      * @param object|array $args
-     * @return $this
+     * @return self
      */
     public static function mapping($args): self
     {

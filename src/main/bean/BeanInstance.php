@@ -13,7 +13,7 @@ interface BeanInstance
 {
     /**
      * @param mixed ...$args
-     * @return self
+     * @return self|null
      */
     public static function newInstance(...$args): ?self;
 }

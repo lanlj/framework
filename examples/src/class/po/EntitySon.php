@@ -25,7 +25,7 @@ class EntitySon extends EntityFa
     private string $prop6 = 'prop6';
 
     /**
-     * EntitySon Constructor.
+     * EntitySon constructor.
      */
     public function __construct()
     {

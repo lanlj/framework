@@ -13,7 +13,7 @@ interface BeanMapping
 {
     /**
      * @param object|array $args
-     * @return self
+     * @return self|null
      */
     public static function mapping($args): ?self;
 }

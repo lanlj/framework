@@ -19,9 +19,10 @@ use lanlj\fw\util\{FileUtil, JsonUtil};
 class SqlLogProxy implements BeanInstance
 {
     /**
-     * @inheritDoc
+     * @param mixed ...$args
+     * @return self
      */
-    public static function newInstance(...$args): ?self
+    public static function newInstance(...$args): self
     {
         return new static();
     }
