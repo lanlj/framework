@@ -12,7 +12,7 @@ use lanlj\fw\base\{Arrays, Strings};
 use lanlj\fw\bean\BeanInstance;
 use lanlj\fw\db\DB;
 use lanlj\fw\filter\Filter;
-use lanlj\fw\http\{Request, Response};
+use lanlj\fw\http\{Request, Response, url\Url};
 use lanlj\fw\proxy\SqlLogProxy;
 use lanlj\fw\util\{BeanUtil, JsonUtil, UrlUtil, Utils, XMLUtil};
 
@@ -165,13 +165,20 @@ class Application implements BeanInstance
      */
     public function getRequestPath(bool $save = true): string
     {
+        $reqPath = '';
         if ($save && !is_null($reqPath = $this->getProperty("requestPath"))) return $reqPath;
 
-        $fixReqPath = $this->getProperty("fixRequestPath", true);
-        $reqPath = parse_url(self::getRequest()->getRequestURL(), PHP_URL_PATH);
+        $reqUrl = new Url(self::getRequest()->getRequestURL());
+        $path = $reqUrl->get(Url::PATH);
+        $query = '';
 
-        if (!$save || $fixReqPath) $reqPath = UrlUtil::fixPath($reqPath);
-        if ($save && is_null($this->getProperty("requestPath"))) $this->setProperty("requestPath", $reqPath);
+        $includeQuery = $this->getProperty("requestPathIncludeQuery", false);
+        $reqQuery = $reqUrl->get(Url::QUERY);
+        if ($includeQuery) $query = in_array($reqQuery, [null, '']) ? '' : "?$reqQuery";
+
+        $fixReqPath = $this->getProperty("fixRequestPath", true);
+        if (!$save || $fixReqPath) $reqPath = UrlUtil::fixPath($path) . $query;
+        if ($save && is_null($this->getProperty("requestPath"))) $this->setProperty("requestPath", $reqPath = $path . $query);
 
         return $reqPath;
     }
@@ -251,13 +258,24 @@ class Application implements BeanInstance
 
     /**
      * 设置是否修复请求路径(剔除请求路径中多余的斜线)
-     * @param bool $fixRequestPath
+     * @param bool $fix
      * @return void
      */
-    public static function setFixRequestPath(bool $fixRequestPath = true): void
+    public static function setFixRequestPath(bool $fix = true): void
     {
         if (!isset(self::$properties)) self::$properties = new Arrays();
-        self::$properties->add($fixRequestPath, "fixRequestPath");
+        self::$properties->add($fix, "fixRequestPath");
+    }
+
+    /**
+     * 设置请求路径是否包含查询
+     * @param bool $includeQuery
+     * @return void
+     */
+    public static function setRequestPathIncludeQuery(bool $includeQuery = false): void
+    {
+        if (!isset(self::$properties)) self::$properties = new Arrays();
+        self::$properties->add($includeQuery, "requestPathIncludeQuery");
     }
 
     /**

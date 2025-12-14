@@ -10,6 +10,8 @@ namespace lanlj\fw\route;
 
 use lanlj\fw\base\Arrays;
 use lanlj\fw\bean\BeanMapping;
+use lanlj\fw\http\url\Url;
+use lanlj\fw\util\ArrayUtil;
 
 class Mapper implements BeanMapping
 {
@@ -185,8 +187,21 @@ class Mapper implements BeanMapping
     public function getParams(): array
     {
         if (is_array($this->params)) return $this->params;
-        $ps = @preg_replace($this->path, $this->params, self::$reqPath);
-        parse_str($ps, $params);
+        parse_str($this->params, $params);
+        @preg_match($this->path, self::$reqPath, $matches);
+        foreach ($params as $key => $value) {
+            @preg_match_all("/\\$(\d+)/", $value, $indexes);
+            foreach ($indexes[0] as $k => $v) {
+                $value = str_replace($v, $matches[$indexes[1][$k]], $value);
+            }
+            $params[$key] = $value;
+        }
+        $initParams = new Arrays($this->getInitParams());
+        if ($initParams->getKeys()->contains('excludeQuery')) {
+            foreach ($initParams->get('excludeQuery', []) as $k => $v) {
+                $params[$k] = (new Url($params[$k]))->removeParamList(ArrayUtil::toArray($v))->build();
+            }
+        }
         return $params;
     }
 
@@ -197,6 +212,26 @@ class Mapper implements BeanMapping
     public function setParams($params): self
     {
         $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInitParams(): array
+    {
+        if (is_array($this->initParams)) return $this->initParams;
+        parse_str($this->initParams, $params);
+        return $params;
+    }
+
+    /**
+     * @param array|string $initParams
+     * @return $this
+     */
+    public function setInitParams($initParams): self
+    {
+        $this->initParams = $initParams;
         return $this;
     }
 
@@ -234,26 +269,6 @@ class Mapper implements BeanMapping
     public function setNamespace(string $namespace): self
     {
         $this->namespace = $namespace;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getInitParams(): array
-    {
-        if (is_array($this->initParams)) return $this->initParams;
-        parse_str($this->initParams, $params);
-        return $params;
-    }
-
-    /**
-     * @param array|string $initParams
-     * @return $this
-     */
-    public function setInitParams($initParams): self
-    {
-        $this->initParams = $initParams;
         return $this;
     }
 

@@ -13,10 +13,10 @@ use lanlj\fw\base\{Arrays, Strings};
 final class Url
 {
     const SCHEME = 'scheme';
-    const HOST = 'host';
-    const PORT = 'port';
     const USER = 'user';
     const PASS = 'pass';
+    const HOST = 'host';
+    const PORT = 'port';
     const QUERY = 'query';
     const PATH = 'path';
     const FRAGMENT = 'fragment';
@@ -49,13 +49,19 @@ final class Url
     public function build(): string
     {
         $scheme = $this->get(self::SCHEME, 'http');
+        $user = $this->get(self::USER);
+        $pass = $this->get(self::PASS);
         $host = $this->get(self::HOST, 'localhost');
         $port = $this->get(self::PORT, 80);
         $path = $this->get(self::PATH, '/');
         $query = $this->get(self::QUERY);
+        $fragment = $this->get(self::FRAGMENT);
         return (new Strings($scheme))->concat('://')
+            ->concat(in_array($user, [null, '']) ? '' : "$user")
+            ->concat(in_array($pass, [null, '']) ? '' : ":$pass@")
             ->concat($host)->concat(in_array($port, [80, 443]) ? '' : ":$port")
-            ->concat($path)->concat(in_array($query, [null, '']) ? '' : "?$query")->getString();
+            ->concat($path)->concat(in_array($query, [null, '']) ? '' : "?$query")
+            ->concat(in_array($fragment, [null, '']) ? '' : "#$fragment")->getString();
     }
 
     /**

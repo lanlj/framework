@@ -232,13 +232,22 @@ final class Request
      */
     public function getRequestURL(): string
     {
+        $port = $this->getServerPort();
         return (new Strings($this->getScheme()))
             ->concat('://')
             ->concat($this->getServerName())
-            ->concat(in_array($this->getServerPort(), [80, 443]) ? '' : ':' . $this->getServerPort())
+            ->concat(in_array($port, [80, 443]) ? '' : ":$port")
 //            ->concat($_SERVER['PHP_SELF'])
             ->concat($this->getRequestURI())
             ->getString();
+    }
+
+    /**
+     * @return string
+     */
+    public function getServerPort(): string
+    {
+        return $_SERVER['SERVER_PORT'];
     }
 
     /**
@@ -255,14 +264,6 @@ final class Request
     public function getServerName(): string
     {
         return $_SERVER['SERVER_NAME'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getServerPort(): string
-    {
-        return $_SERVER['SERVER_PORT'];
     }
 
     /**

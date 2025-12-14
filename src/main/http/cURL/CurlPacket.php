@@ -141,8 +141,10 @@ final class CurlPacket implements BeanMapping
      */
     public function setResponseHeaders(array $responseHeaders): self
     {
-        $this->responseHeaders = $responseHeaders;
-        $this->statusCode = $responseHeaders[0];
+        $statuses = array_filter($responseHeaders, 'is_int', ARRAY_FILTER_USE_KEY);
+        $index = max(array_keys($statuses));
+        $this->statusCode = $responseHeaders[$index];
+        $this->responseHeaders = array_diff_key($responseHeaders, $statuses);
         return $this;
     }
 
